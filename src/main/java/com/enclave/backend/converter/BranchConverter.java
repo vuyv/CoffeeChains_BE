@@ -10,7 +10,7 @@ public class BranchConverter {
         Branch entity = new Branch();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
-        entity.setAddress(entity.getAddress());
+        entity.setAddress(dto.getAddress());
         entity.setStatus(Branch.Status.ACTIVE);
         return entity;
     }

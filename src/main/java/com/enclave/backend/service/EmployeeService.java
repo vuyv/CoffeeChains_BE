@@ -1,6 +1,7 @@
 package com.enclave.backend.service;
 
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -17,4 +18,8 @@ public interface EmployeeService extends UserDetailsService {
     List<Employee> getEmployees();
 
     List<Employee> getEmployeesByBranch();
+
+    Employee disableEmployee(short id);
+
+    Employee createEmployeeInBranch(BranchEmployeeDTO branchEmployeeDTO);
 }

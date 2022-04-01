@@ -2,6 +2,7 @@ package com.enclave.backend.service.impl;
 
 import com.enclave.backend.converter.EmployeeConverter;
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Role;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,13 +99,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getEmployeesByBranch() {
         short branchId = getCurrentEmployee().getBranch().getId();
-        List <Employee> employees = new ArrayList<>();
-        employeeRepository.findAll().forEach(employee -> {
-            if(branchId == employee.getBranch().getId()){
-                employees.add(employee);
-            }
-        });
-        return employees;
+        return employeeRepository.findByBranch(branchId);
+    }
+
+    @Override
+    public Employee disableEmployee(short id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid employee Id:" + id));
+        employee.setStatus(Employee.Status.INACTIVE);
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee createEmployeeInBranch(BranchEmployeeDTO branchEmployeeDTO) {
+        Employee newEmployee = employeeConverter.toEntity(branchEmployeeDTO);
+
+        Employee manager = getCurrentEmployee();
+        newEmployee.setBranch(manager.getBranch());
+
+        Role role = roleRepository.findById((short) 3).orElseThrow(()-> new IllegalArgumentException("Invalid role Id:"));
+        newEmployee.setRole(role);
+
+        newEmployee.setPassword(passwordEncode.encode("123123"));
+        newEmployee.setStatus(Employee.Status.ACTIVE);
+        employeeRepository.save(newEmployee);
+        return employeeRepository.save(newEmployee);
     }
 
     @Override

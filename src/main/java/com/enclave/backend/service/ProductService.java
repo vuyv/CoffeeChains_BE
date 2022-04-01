@@ -14,4 +14,6 @@ public interface ProductService {
     List<Product> getProducts();
 
     Product getProductById(short id);
+
+    List<Product> findByCategory(short categoryId);
 }

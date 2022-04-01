@@ -52,7 +52,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(oldProduct);
     }
 
-    // get product by category
 
     //TODO: Pagination
     @Override
@@ -65,5 +64,9 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Invalid product id: " + id));
     }
 
+    @Override
+    public List<Product> findByCategory(short categoryId) {
+        return  productRepository.findByCategory(categoryId);
+    }
 
 }

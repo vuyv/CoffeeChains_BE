@@ -4,6 +4,7 @@ import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.entity.Order;
 import com.enclave.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class OrderAPI {
     private OrderService orderService;
 
     @PostMapping("/new")
-    public Order createNewOrder(@RequestBody OrderDTO orderDTO) {
+    public ResponseEntity<Order> createNewOrder(@RequestBody OrderDTO orderDTO) {
         return orderService.createNewOrder(orderDTO);
     }
 

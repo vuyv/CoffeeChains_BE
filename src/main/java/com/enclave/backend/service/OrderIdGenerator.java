@@ -22,8 +22,8 @@ public class OrderIdGenerator {
     private StringBuilder generateKey(Branch branch, Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyMMdd");
         String strDate = formatter.format(date);
-        StringBuilder key = new StringBuilder(String.valueOf(branch.getId()));
-        key.append(strDate);
+        StringBuilder key = new StringBuilder(String.valueOf(String.format("%03d",branch.getId())));
+        key.append("_").append(strDate).append("_");
         return key;
     }
 
@@ -34,6 +34,8 @@ public class OrderIdGenerator {
     public String createOrderIdForBranch(Date date) {
         StringBuilder key = generateKey(employeeService.getCurrentEmployee().getBranch(), date);
         Long ordinalNumber = generateOrdinalNumber(String.valueOf(key));
-        return String.valueOf(key.append(ordinalNumber));
+        String ordinalNumberFormatted = String.format("%03d", ordinalNumber);
+        String orderId = String.valueOf(key.append(ordinalNumberFormatted));
+        return orderId;
     }
 }

@@ -26,13 +26,13 @@ public class Employee extends AbstractUser {
     @Column
     private short id;
 
-    @Column
+    @Column(length = 20)
     private String phone;
 
-    @Column
+    @Column(length = 20)
     private String username;
 
-    @Column
+    @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Status status;
 

@@ -2,12 +2,13 @@ package com.enclave.backend.service;
 
 import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.entity.Order;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface OrderService {
 
-    Order createNewOrder(OrderDTO orderDTO);
+    ResponseEntity<Order> createNewOrder(OrderDTO orderDTO);
 
 
     Order findOrderById(String id);

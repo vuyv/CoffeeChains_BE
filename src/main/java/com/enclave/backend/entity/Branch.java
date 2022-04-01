@@ -5,9 +5,9 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.GenerationType;
+import javax.persistence.Table;
+import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
 import javax.persistence.Enumerated;
@@ -25,17 +25,17 @@ public class Branch {
     @Column
     private short id;
 
-    @Column
+    @Column(length = 50)
     private String name;
 
-    @Column
+    @Column(length = 100)
     private String address;
 
     @JsonIgnore
     @OneToMany(mappedBy = "branch")
     private Set<Employee> employees = new HashSet<>();
 
-    @Column
+    @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Status status;
 

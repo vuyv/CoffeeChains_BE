@@ -11,17 +11,17 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class AbstractUser {
 
-    @Column
+    @Column(length = 10)
     private String name;
 
-    @Column
+    @Column(length = 60)
     @JsonIgnore
     private String password;
 
-    @Column
+    @Column(length = 20)
     private String gender;
 
-    @Column
+    @Column(length = 120)
     private String address;
 
     @Column

@@ -1,6 +1,7 @@
 package com.enclave.backend.api;
 
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,18 @@ public class EmployeeAPI {
         return employeeService.getEmployees();
     }
 
-    @GetMapping("/{id}/all")
+    @GetMapping("/branch/all")
     public List getEmployeesByBranch() {
         return employeeService.getEmployeesByBranch();
+    }
+
+    @PutMapping("/disable/{id}")
+    public Employee disableEmployee(@PathVariable("id") short id){
+        return employeeService.disableEmployee(id);
+    }
+
+    @PostMapping("/newInBranch")
+    public Employee createEmployeeInBranch(@RequestBody BranchEmployeeDTO branchEmployeeDTO){
+    return employeeService.createEmployeeInBranch(branchEmployeeDTO);
     }
 }

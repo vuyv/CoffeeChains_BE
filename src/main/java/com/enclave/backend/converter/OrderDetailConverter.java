@@ -16,9 +16,7 @@ public class OrderDetailConverter {
         OrderDetail entity = new OrderDetail();
         entity.setQuantity(orderDetailDTO.getQuantity());
         Product product = productService.getProductById(orderDetailDTO.getProduct().getId());
-        product.setOrderDetail(entity);
         entity.setProduct(product);
-
         return entity;
     }
 }

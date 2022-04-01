@@ -2,6 +2,7 @@ package com.enclave.backend.entity;
 
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
@@ -9,9 +10,9 @@ import java.io.Serializable;
 @Data
 public class OrderDetailId implements Serializable {
 
-//    @Column(name = "orderId")
+    @Column(name = "orderId", length = 15)
     private String orderId;
 
-//    @Column(name = "productId")
+    @Column(name = "productId")
     private short productId;
 }

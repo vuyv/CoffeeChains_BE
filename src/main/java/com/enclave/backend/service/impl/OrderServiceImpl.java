@@ -17,10 +17,14 @@ import com.enclave.backend.service.OrderIdGenerator;
 import com.enclave.backend.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -66,21 +70,33 @@ public class OrderServiceImpl implements OrderService {
         return productsInDB;
     }
 
-    private List<Product> isValidProduct(OrderDTO orderDTO) {
+    private boolean isValidProduct(OrderDTO orderDTO) {
         List<Product> productsInDB = getListProductInDB(orderDTO.getOrderDetails());
         List<ProductInOrderDTO> productsInFE = getListProductInFE(orderDTO.getOrderDetails());
         if (productsInFE.size() != productsInDB.size()) {
-            return null;
+            return false;
         }
-        return productsInDB;
+        for (Product productDB : productsInDB) {
+            for (ProductInOrderDTO productFE : productsInFE) {
+                if (productDB.getId() != productFE.getId()) {
+                    return false;
+                }
+                if (productDB.getPrice() == productFE.getPrice()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private double applyDiscountCode(double total, String discountCode, Date currentDate) {
         Discount discount = discountService.getDiscountWithDate(discountCode, currentDate);
         if (!discountService.isValidDiscount(discountCode, currentDate)) {
-            throw new IllegalArgumentException("Invalid discount");
+            ResponseEntity.status(HttpStatus.NOT_FOUND);
+            return total;
         }
         total -= total * discount.getPercent() / 100;
+        ResponseEntity.status(HttpStatus.OK);
         return total;
     }
 
@@ -97,13 +113,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createNewOrder(OrderDTO orderDTO) {
-        List<Product> products = isValidProduct(orderDTO);
-        if (products.size() == 0) {
-            return null;
+    public ResponseEntity<Order> createNewOrder(OrderDTO orderDTO) {
+        if (!isValidProduct(orderDTO)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid product").body(null);
         }
 
-        double total = calculateTotal(orderDTO.getOrderDetails(), products);
+        double total = calculateTotal(orderDTO.getOrderDetails(), getListProductInDB(orderDTO.getOrderDetails()));
         Date date = new Date();
         Order newOrder = orderConverter.toEntity(orderDTO);
         String orderId = orderIdGenerator.createOrderIdForBranch(date);
@@ -119,23 +134,24 @@ public class OrderServiceImpl implements OrderService {
             orderDetails.add(orderDetail);
         });
         newOrder.setOrderDetails(orderDetails);
-//        newOrder.getOrderDetails().forEach(orderDetail -> {
-//            orderDetail.setOrder(newOrder);
-//        });
 
-        if (orderDTO.getDiscount_code() == "") {
-            newOrder.setTotalPrice(total);
-            return orderRepository.save(newOrder);
+        if (orderDTO.getDiscount_code() != "") {
+            total = applyDiscountCode(total, orderDTO.getDiscount_code(), date);
+            if (isValidTotal(orderDTO, total)) {
+                newOrder.setDiscount(discountService.getDiscountByCode(orderDTO.getDiscount_code()));
+                newOrder.setTotalPrice(total);
+                orderRepository.save(newOrder);
+                return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
         }
-        total = applyDiscountCode(total, orderDTO.getDiscount_code(), date);
-        newOrder.setDiscount(discountService.getDiscountByCode(orderDTO.getDiscount_code()));
 
         if (isValidTotal(orderDTO, total)) {
             newOrder.setTotalPrice(total);
+            orderRepository.save(newOrder);
+            return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
         }
-
-//        newOrder.setOrderDetails(orderDetails);
-        return orderRepository.save(newOrder);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
     }
 
     @Override
