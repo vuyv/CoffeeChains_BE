@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 public class BranchConverter {
     public Branch toEntity(BranchDTO dto) {
         Branch entity = new Branch();
-        entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setAddress(dto.getAddress());
         entity.setStatus(Branch.Status.ACTIVE);
