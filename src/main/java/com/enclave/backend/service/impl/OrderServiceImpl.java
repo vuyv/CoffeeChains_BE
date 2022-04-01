@@ -78,11 +78,8 @@ public class OrderServiceImpl implements OrderService {
         }
         for (Product productDB : productsInDB) {
             for (ProductInOrderDTO productFE : productsInFE) {
-                if (productDB.getId() != productFE.getId()) {
-                    return false;
-                }
-                if (productDB.getPrice() == productFE.getPrice()) {
-                    return true;
+                if (productDB.getId() == productFE.getId()) {
+                    return productDB.getPrice() == productFE.getPrice();
                 }
             }
         }

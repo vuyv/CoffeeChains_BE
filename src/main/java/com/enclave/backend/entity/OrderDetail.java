@@ -29,7 +29,7 @@ public class OrderDetail{
     @JsonIgnore
     private Order order;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "productId")
     @MapsId("productId")
     private Product product;

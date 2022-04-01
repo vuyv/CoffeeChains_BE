@@ -55,7 +55,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Role role = roleRepository.findById(roleId).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:" + roleId));
 
         Employee newEmployee = employeeConverter.toEntity(dto);
-
         newEmployee.setRole(role);
         newEmployee.setBranch(branch);
         newEmployee.setPassword(passwordEncode.encode("123123"));
@@ -71,7 +70,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee oldEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + employeeId));
 
         short branchId = employee.getBranch().getId();
-
         Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branchId));
 
         oldEmployee.setName(employee.getName());
