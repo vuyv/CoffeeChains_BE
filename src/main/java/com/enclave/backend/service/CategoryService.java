@@ -12,4 +12,6 @@ public interface CategoryService {
     Category updateCategory(Category category);
 
     List<Category> getCategories();
+
+    Category getCategoryById(short id);
 }

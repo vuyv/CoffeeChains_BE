@@ -29,4 +29,9 @@ public class CategoryAPI {
     public Category editCategory(@RequestBody Category category) {
         return categoryService.updateCategory(category);
     }
+
+    @GetMapping("/{id}")
+    public Category getCategoryById(@PathVariable ("id") short id){
+        return categoryService.getCategoryById(id);
+    }
 }
