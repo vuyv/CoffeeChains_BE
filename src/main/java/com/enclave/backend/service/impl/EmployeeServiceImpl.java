@@ -65,24 +65,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Employee employee) {
+    public Employee updateEmployee(short id, EmployeeDTO employeeDTO) {
 
-        short employeeId = employee.getId();
-        Employee oldEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + employeeId));
+        Employee oldEmployee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
-        short branchId = employee.getBranch().getId();
 
-        Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branchId));
+        Branch branch = branchRepository.findById(employeeDTO.getBranchId()).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + employeeDTO.getBranchId()));
+        Role role = roleRepository.findById(employeeDTO.getRoleId()).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:" + employeeDTO.getRoleId()));
 
-        oldEmployee.setName(employee.getName());
-        oldEmployee.setPhone(employee.getPhone());
-        oldEmployee.setBirth(employee.getBirth());
-        oldEmployee.setAvatar(employee.getAvatar());
-        oldEmployee.setGender(employee.getGender());
-        oldEmployee.setAddress(employee.getAddress());
-        oldEmployee.setUsername(employee.getUsername());
+        oldEmployee.setName(employeeDTO.getName());
+        oldEmployee.setPhone(employeeDTO.getPhone());
+        oldEmployee.setBirth(employeeDTO.getBirth());
+        oldEmployee.setAvatar(employeeDTO.getAvatar());
+        oldEmployee.setGender(employeeDTO.getGender());
+        oldEmployee.setAddress(employeeDTO.getAddress());
+        oldEmployee.setUsername(employeeDTO.getUsername());
         oldEmployee.setBranch(branch);
-        oldEmployee.setPassword(passwordEncode.encode(employee.getPassword()));
+        oldEmployee.setRole(role);
+
         return employeeRepository.save(oldEmployee);
     }
 

@@ -11,7 +11,7 @@ public interface EmployeeService extends UserDetailsService {
 
     Employee createEmployee(EmployeeDTO dto);
 
-    Employee updateEmployee(Employee employee);
+    Employee updateEmployee(short id, EmployeeDTO employeeDTO);
 
     Employee getEmployeeById(short id);
 

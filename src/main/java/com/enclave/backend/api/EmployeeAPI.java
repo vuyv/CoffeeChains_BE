@@ -27,8 +27,8 @@ public class EmployeeAPI {
     }
 
     @PutMapping("/{id}")
-    public Employee updateEmployee(@RequestBody Employee employee) {
-        return employeeService.updateEmployee(employee);
+    public Employee updateEmployee(@PathVariable("id") short id, @RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.updateEmployee(id, employeeDTO );
     }
 
     @GetMapping("/all")

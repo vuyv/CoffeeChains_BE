@@ -61,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/category/*").hasAuthority("OWNER")
                 .antMatchers("/api/product/*").hasAuthority("OWNER")
                 .antMatchers("/api/discount/*").hasAnyAuthority("OWNER")
-                .antMatchers("/api/employee/*").hasAuthority("MANAGER")
+                .antMatchers("/api/employee/*").hasAnyAuthority("MANAGER", "OWNER")
                 .antMatchers("/api/employee/{id}/all").hasAuthority("MANAGER")
                 .antMatchers("/api/employee/{id}").hasAuthority("SELLER")
                 .antMatchers("/api/order/all").hasAnyAuthority("MANAGER")
