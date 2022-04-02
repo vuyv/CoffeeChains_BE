@@ -34,4 +34,9 @@ public class ProductAPI {
     public Product getProductById(@PathVariable ("id") short id) {
         return productService.getProductById(id);
     }
+
+    @GetMapping("/category/{categoryId}")
+    public List<Product> findByCategory(@PathVariable("categoryId") short categoryid){
+        return productService.findByCategory(categoryid);
+    }
 }

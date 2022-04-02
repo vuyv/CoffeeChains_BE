@@ -24,7 +24,7 @@ public class Category {
     @Column
     private short id;
 
-    @Column
+    @Column(length = 30)
     private String name;
 
     @JsonIgnore

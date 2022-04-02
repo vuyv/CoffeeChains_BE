@@ -2,6 +2,7 @@ package com.enclave.backend.service.impl;
 
 import com.enclave.backend.converter.EmployeeConverter;
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Role;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,24 +65,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Employee employee) {
+    public Employee updateEmployee(short id, EmployeeDTO employeeDTO) {
 
-        short employeeId = employee.getId();
-        Employee oldEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + employeeId));
+        Employee oldEmployee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
-        short branchId = employee.getBranch().getId();
 
-        Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branchId));
+        Branch branch = branchRepository.findById(employeeDTO.getBranchId()).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + employeeDTO.getBranchId()));
+        Role role = roleRepository.findById(employeeDTO.getRoleId()).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:" + employeeDTO.getRoleId()));
 
-        oldEmployee.setName(employee.getName());
-        oldEmployee.setPhone(employee.getPhone());
-        oldEmployee.setBirth(employee.getBirth());
-        oldEmployee.setAvatar(employee.getAvatar());
-        oldEmployee.setGender(employee.getGender());
-        oldEmployee.setAddress(employee.getAddress());
-        oldEmployee.setUsername(employee.getUsername());
+        oldEmployee.setName(employeeDTO.getName());
+        oldEmployee.setPhone(employeeDTO.getPhone());
+        oldEmployee.setBirth(employeeDTO.getBirth());
+        oldEmployee.setAvatar(employeeDTO.getAvatar());
+        oldEmployee.setGender(employeeDTO.getGender());
+        oldEmployee.setAddress(employeeDTO.getAddress());
+        oldEmployee.setUsername(employeeDTO.getUsername());
         oldEmployee.setBranch(branch);
-        oldEmployee.setPassword(passwordEncode.encode(employee.getPassword()));
+        oldEmployee.setRole(role);
+
         return employeeRepository.save(oldEmployee);
     }
 
@@ -99,13 +99,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getEmployeesByBranch() {
         short branchId = getCurrentEmployee().getBranch().getId();
-        List <Employee> employees = new ArrayList<>();
-        employeeRepository.findAll().forEach(employee -> {
-            if(branchId == employee.getBranch().getId()){
-                employees.add(employee);
-            }
-        });
-        return employees;
+        return employeeRepository.findByBranch(branchId);
+    }
+
+    @Override
+    public Employee disableEmployee(short id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid employee Id:" + id));
+        employee.setStatus(Employee.Status.INACTIVE);
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee createEmployeeInBranch(BranchEmployeeDTO branchEmployeeDTO) {
+        Employee newEmployee = employeeConverter.toEntity(branchEmployeeDTO);
+
+        Employee manager = getCurrentEmployee();
+        newEmployee.setBranch(manager.getBranch());
+
+        Role role = roleRepository.findById((short) 3).orElseThrow(()-> new IllegalArgumentException("Invalid role Id:"));
+        newEmployee.setRole(role);
+
+        newEmployee.setPassword(passwordEncode.encode("123123"));
+        newEmployee.setStatus(Employee.Status.ACTIVE);
+        employeeRepository.save(newEmployee);
+        return employeeRepository.save(newEmployee);
     }
 
     @Override

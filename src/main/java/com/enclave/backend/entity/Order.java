@@ -3,7 +3,16 @@ package com.enclave.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.CascadeType;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +22,7 @@ import java.util.List;
 public class Order {
 
     @Id
-    @Column
+    @Column(length = 15)
     private String id;
 
     @ManyToOne
@@ -36,7 +45,7 @@ public class Order {
     @JoinColumn(name = "canceledBy")
     private Employee canceledBy;
 
-    @Column
+    @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Status status;
 

@@ -20,10 +20,10 @@ import java.util.Set;
 public class Discount {
 
     @Id
-    @Column
+    @Column(length = 6)
     private String code;
 
-    @Column
+    @Column(length = 150)
     private String title;
 
     @Column
@@ -39,7 +39,7 @@ public class Discount {
     @OneToMany(mappedBy = "discount")
     private Set<Order> orders;
 
-    @Column
+    @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Status status;
 

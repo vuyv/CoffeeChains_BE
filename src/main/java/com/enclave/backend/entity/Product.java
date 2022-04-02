@@ -1,6 +1,5 @@
 package com.enclave.backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -10,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
 
@@ -24,7 +22,7 @@ public class Product {
     @Column
     private short id;
 
-    @Column
+    @Column(length = 30)
     private String name;
 
     @ManyToOne
@@ -37,13 +35,9 @@ public class Product {
     @Column
     private double price;
 
-    @Column
+    @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    @JsonIgnore
-    @OneToOne(mappedBy = "product")
-    private OrderDetail orderDetail;
 
     public enum Status{
         AVAILABLE, UNAVAILABLE

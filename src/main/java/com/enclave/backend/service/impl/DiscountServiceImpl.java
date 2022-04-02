@@ -24,10 +24,8 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public Discount createDiscount(DiscountDTO discountDTO) {
         Discount discount = discountConverter.toEntity(discountDTO);
-
         String generatedString = RandomStringUtils.randomAlphabetic(6);
         discount.setCode(generatedString);
-
         return discountRepository.save(discount);
     }
 
@@ -49,10 +47,7 @@ public class DiscountServiceImpl implements DiscountService {
         if (startedAt.equals(currentDate) || endedAt.equals(currentDate)) {
             return true;
         }
-        if( startedAt.before(currentDate) && endedAt.after(currentDate)){
-            return true;
-        }
-        return false;
+        return startedAt.before(currentDate) && endedAt.after(currentDate);
     }
 
     @Override

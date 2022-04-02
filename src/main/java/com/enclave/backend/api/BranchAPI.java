@@ -27,6 +27,7 @@ public class BranchAPI {
 
     @PutMapping("/{id}")
     public Branch editBranch(@PathVariable("id") short id, @RequestBody Branch branch) {
+        branch.setId(id);
         return branchService.updateBranch(branch);
     }
 

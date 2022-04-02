@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 public class CategoryConverter {
     public Category toEntity(CategoryDTO dto) {
         Category category = new Category();
-        category.setId(dto.getId());
         category.setName(dto.getName());
         return category;
     }

@@ -23,7 +23,7 @@ public class Role {
     @Column
     private short id;
 
-    @Column
+    @Column(length = 10)
     private String name;
 
     @JsonIgnore

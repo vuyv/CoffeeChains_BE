@@ -7,5 +7,6 @@ import lombok.Data;
 public class BranchDTO {
     private short id;
     private String name;
+    private String address;
     private Branch.Status status;
 }
