@@ -27,7 +27,8 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public Branch updateBranch(Branch branch) {
-        Branch oldBranch = branchRepository.findById(branch.getId())
+        short id= branch.getId();
+        Branch oldBranch = branchRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branch.getId()));
         oldBranch.setName(branch.getName());
         oldBranch.setAddress(branch.getAddress());
