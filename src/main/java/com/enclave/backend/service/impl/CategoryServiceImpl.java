@@ -37,4 +37,9 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> getCategories() {
         return categoryRepository.findAll();
     }
+
+    @Override
+    public Category getCategoryById(short id) {
+        return categoryRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Invalid category id " + id));
+    }
 }

@@ -9,7 +9,6 @@ import com.enclave.backend.entity.Discount;
 import com.enclave.backend.entity.Order;
 import com.enclave.backend.entity.OrderDetail;
 import com.enclave.backend.entity.Product;
-import com.enclave.backend.repository.OrderDetailRepository;
 import com.enclave.backend.repository.OrderRepository;
 import com.enclave.backend.repository.ProductRepository;
 import com.enclave.backend.service.DiscountService;
@@ -47,9 +46,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private EmployeeServiceImpl employeeService;
-
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
 
     @Autowired
     private OrderDetailConverter orderDetailConverter;

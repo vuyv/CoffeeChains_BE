@@ -15,8 +15,6 @@ public interface OrderService {
 
     Order findOrderByOrdinalNumber(int ordinalNumber);
 
-//    double calculateTotal(Order order);
-
     Order cancelOrder(Order order);
 
     boolean isValidTotal(OrderDTO orderDTO, double total);

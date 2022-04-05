@@ -22,7 +22,8 @@ public class DiscountAPI {
     }
 
     @PutMapping("/{code}")
-    public Discount updateDiscount(@RequestBody Discount discount) {
+    public Discount updateDiscount(@PathVariable("code") String code,@RequestBody Discount discount) {
+        discount.setCode(code);
         return discountService.updateDiscount(discount);
     }
 
