@@ -42,4 +42,9 @@ public class DiscountAPI {
         Date currentDate = new Date();
         return discountService.isValidDiscount(code, currentDate);
     }
+
+    @GetMapping("/status/{status}")
+    public List<Discount> getDiscounstByStatus(@PathVariable("status") String status) {
+        return discountService.getDiscountsByStatus(status);
+    }
 }

@@ -3,6 +3,7 @@ package com.enclave.backend.service.impl;
 import com.enclave.backend.converter.ProductConverter;
 import com.enclave.backend.dto.ProductDTO;
 import com.enclave.backend.entity.Category;
+import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Product;
 import com.enclave.backend.repository.CategoryRepository;
 import com.enclave.backend.repository.ProductRepository;
@@ -37,17 +38,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        short categoryId = product.getCategory().getId();
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid category id: " + categoryId));
+    public Product updateProduct(short id, ProductDTO productDTO) {
+        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Invalid category id: " + productDTO.getCategoryId()));
 
-        short productId = product.getId();
-        Product oldProduct = productRepository.findById(productId).orElseThrow();
-        oldProduct.setName(product.getName());
-        oldProduct.setPrice(product.getPrice());
-        oldProduct.setImage(product.getImage());
+        Product oldProduct = productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product id: " + id));
+        oldProduct.setName(productDTO.getName());
+        oldProduct.setPrice(productDTO.getPrice());
+        oldProduct.setImage(productDTO.getImage());
         oldProduct.setCategory(category);
-        oldProduct.setStatus(product.getStatus());
+//        oldProduct.setStatus(productDTO.getStatus());
 
         return productRepository.save(oldProduct);
     }
@@ -67,6 +66,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> findByCategory(short categoryId) {
         return  productRepository.findByCategory(categoryId);
+    }
+
+    @Override
+    public Product disableProduct(short id) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
+        product.setStatus(Product.Status.UNAVAILABLE);
+        return productRepository.save(product);
     }
 
 }

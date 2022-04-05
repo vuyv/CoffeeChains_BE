@@ -1,6 +1,7 @@
 package com.enclave.backend.api;
 
 import com.enclave.backend.dto.ProductDTO;
+import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Product;
 import com.enclave.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,8 @@ public class ProductAPI {
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") short id, @RequestBody Product product) {
-        product.setId(id);
-        return productService.updateProduct(product);
+    public Product updateProduct(@PathVariable ("id") short id, @RequestBody ProductDTO productDTO) {
+        return productService.updateProduct(id, productDTO);
     }
 
     @GetMapping("/all")
@@ -39,5 +39,10 @@ public class ProductAPI {
     @GetMapping("/category/{categoryId}")
     public List<Product> findByCategory(@PathVariable("categoryId") short categoryid){
         return productService.findByCategory(categoryid);
+    }
+
+    @PutMapping("/disable/{id}")
+    public Product disableProduct(@PathVariable("id") short id){
+        return productService.disableProduct(id);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -69,5 +70,12 @@ public class DiscountServiceImpl implements DiscountService {
     public Discount getDiscountWithDate(String code, Date currentDate) {
         Discount discount = discountRepository.findById(code).orElseThrow(() -> new IllegalArgumentException("Invalid discount code: " + code));
         return discount.getStartedAt().compareTo(currentDate) * currentDate.compareTo(discount.getEndedAt()) >= 0 ? discount : null;
+    }
+
+    @Override
+    public List<Discount> getDiscountsByStatus(String status) {
+        Discount.Status statusEnum = Discount.Status.valueOf(status.toUpperCase(Locale.ROOT));
+        List<Discount> discounts = discountRepository.getDiscountsByStatus(statusEnum);
+        return discounts;
     }
 }

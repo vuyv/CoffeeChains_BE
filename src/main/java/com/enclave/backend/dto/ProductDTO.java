@@ -11,5 +11,5 @@ public class ProductDTO {
     private short categoryId;
     private double price;
     private String image;
-    Product.Status status;
+//    Product.Status status;
 }
