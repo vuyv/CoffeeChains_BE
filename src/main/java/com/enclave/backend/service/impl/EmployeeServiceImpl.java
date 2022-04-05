@@ -1,10 +1,13 @@
 package com.enclave.backend.service.impl;
 
 import com.enclave.backend.converter.EmployeeConverter;
+import com.enclave.backend.converter.PasswordConverter;
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.PasswordDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Employee;
+import com.enclave.backend.entity.Password;
 import com.enclave.backend.entity.Role;
 import com.enclave.backend.jwt.CustomUserDetails;
 import com.enclave.backend.repository.BranchRepository;
@@ -12,9 +15,11 @@ import com.enclave.backend.repository.EmployeeRepository;
 import com.enclave.backend.repository.RoleRepository;
 import com.enclave.backend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +45,38 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private BCryptPasswordEncoder passwordEncode;
 
+    @Autowired
+    private PasswordConverter passwordConverter;
+
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public String currentUserName() {
+        return getAuthentication().getName();
+    }
+
+    @Override
     public Employee getCurrentEmployee() {
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = customUserDetails.getUsername();
+//        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = currentUserName();
+        System.out.println(username);
+        Employee temp = employeeRepository.findByUsername(username);
+        System.out.println("Temp:" + temp.getUsername());
         return employeeRepository.findByUsername(username);
+    }
+
+    @Override
+    public Employee changePassword(short id, PasswordDTO passwordDTO) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        Password password = passwordConverter.toEntity(passwordDTO);
+        boolean value = BCrypt.checkpw(password.getOldPassword(), employee.getPassword());
+        if (value) {
+            if (password.getNewPassword().equals(password.getConfirmPassword())) {
+                employee.setPassword(passwordEncode.encode(password.getConfirmPassword()));
+            }
+        }
+        return employeeRepository.save(employee);
     }
 
     @Override
@@ -55,6 +88,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Role role = roleRepository.findById(roleId).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:" + roleId));
 
         Employee newEmployee = employeeConverter.toEntity(dto);
+
         newEmployee.setRole(role);
         newEmployee.setBranch(branch);
         newEmployee.setPassword(passwordEncode.encode("123123"));
@@ -64,23 +98,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Employee employee) {
+    public Employee updateEmployee(short id, EmployeeDTO employeeDTO) {
 
-        short employeeId = employee.getId();
-        Employee oldEmployee = employeeRepository.findById(employeeId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + employeeId));
+        Employee oldEmployee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
-        short branchId = employee.getBranch().getId();
-        Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branchId));
+        Branch branch = branchRepository.findById(employeeDTO.getBranchId()).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + employeeDTO.getBranchId()));
+        Role role = roleRepository.findById(employeeDTO.getRoleId()).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:" + employeeDTO.getRoleId()));
 
-        oldEmployee.setName(employee.getName());
-        oldEmployee.setPhone(employee.getPhone());
-        oldEmployee.setBirth(employee.getBirth());
-        oldEmployee.setAvatar(employee.getAvatar());
-        oldEmployee.setGender(employee.getGender());
-        oldEmployee.setAddress(employee.getAddress());
-        oldEmployee.setUsername(employee.getUsername());
+        oldEmployee.setName(employeeDTO.getName());
+        oldEmployee.setPhone(employeeDTO.getPhone());
+        oldEmployee.setBirth(employeeDTO.getBirth());
+        oldEmployee.setAvatar(employeeDTO.getAvatar());
+        oldEmployee.setGender(employeeDTO.getGender());
+        oldEmployee.setAddress(employeeDTO.getAddress());
+        oldEmployee.setUsername(employeeDTO.getUsername());
         oldEmployee.setBranch(branch);
-        oldEmployee.setPassword(passwordEncode.encode(employee.getPassword()));
+        oldEmployee.setRole(role);
+
         return employeeRepository.save(oldEmployee);
     }
 
@@ -114,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee manager = getCurrentEmployee();
         newEmployee.setBranch(manager.getBranch());
 
-        Role role = roleRepository.findById((short) 3).orElseThrow(()-> new IllegalArgumentException("Invalid role Id:"));
+        Role role = roleRepository.findById((short) 3).orElseThrow(() -> new IllegalArgumentException("Invalid role Id:"));
         newEmployee.setRole(role);
 
         newEmployee.setPassword(passwordEncode.encode("123123"));

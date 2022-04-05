@@ -1,6 +1,7 @@
 package com.enclave.backend.api;
 
 import com.enclave.backend.dto.EmployeeDTO;
+import com.enclave.backend.dto.PasswordDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.service.EmployeeService;
@@ -27,8 +28,8 @@ public class EmployeeAPI {
     }
 
     @PutMapping("/{id}")
-    public Employee updateEmployee(@RequestBody Employee employee) {
-        return employeeService.updateEmployee(employee);
+    public Employee updateEmployee(@PathVariable("id") short id, @RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.updateEmployee(id, employeeDTO );
     }
 
     @GetMapping("/all")
@@ -49,5 +50,15 @@ public class EmployeeAPI {
     @PostMapping("/newInBranch")
     public Employee createEmployeeInBranch(@RequestBody BranchEmployeeDTO branchEmployeeDTO){
     return employeeService.createEmployeeInBranch(branchEmployeeDTO);
+    }
+
+    @GetMapping("/currentUser")
+    public Employee getCurrentEmployee(){
+        return employeeService.getCurrentEmployee();
+    }
+
+    @PutMapping("/changePassword/{id}")
+    public Employee changePassword(@PathVariable("id") short id, @RequestBody PasswordDTO passwordDTO){
+        return employeeService.changePassword(id, passwordDTO);
     }
 }

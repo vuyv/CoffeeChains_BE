@@ -21,7 +21,8 @@ public class ProductAPI {
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@RequestBody Product product) {
+    public Product updateProduct(@PathVariable("id") short id, @RequestBody Product product) {
+        product.setId(id);
         return productService.updateProduct(product);
     }
 

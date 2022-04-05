@@ -11,7 +11,7 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class AbstractUser {
 
-    @Column(length = 10)
+    @Column(length = 50)
     private String name;
 
     @Column(length = 60)

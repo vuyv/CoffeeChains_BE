@@ -26,7 +26,8 @@ public class CategoryAPI {
     }
 
     @PutMapping("/{id}")
-    public Category editCategory(@RequestBody Category category) {
+    public Category editCategory(@PathVariable("id") short id,@RequestBody Category category) {
+        category.setId(id);
         return categoryService.updateCategory(category);
     }
 
