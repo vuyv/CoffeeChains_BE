@@ -18,4 +18,6 @@ public interface DiscountService {
     List<Discount> getDiscounts();
 
     Discount getDiscountWithDate(String code, Date currentDate);
+
+    List<Discount> getDiscountsByStatus(String status);
 }

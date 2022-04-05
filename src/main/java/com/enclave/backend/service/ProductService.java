@@ -9,11 +9,13 @@ public interface ProductService {
 
     Product createProduct(ProductDTO productDTO);
 
-    Product updateProduct(Product product);
+    Product updateProduct(short id, ProductDTO productDTO);
 
     List<Product> getProducts();
 
     Product getProductById(short id);
 
     List<Product> findByCategory(short categoryId);
+
+    Product disableProduct(short id);
 }
