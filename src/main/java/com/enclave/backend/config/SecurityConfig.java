@@ -55,18 +55,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/api/login").permitAll()
-//                .antMatchers("/api/").authenticated()
-//                .antMatchers("/api/branch/").hasAnyAuthority("OWNER")
-                .antMatchers("/api/branch/*").hasAuthority("OWNER")
-                .antMatchers("/api/category/*").hasAuthority("OWNER")
-                .antMatchers("/api/product/*").hasAuthority("OWNER")
-                .antMatchers("/api/discount/*").hasAnyAuthority("OWNER")
-                .antMatchers("/api/employee/*").hasAnyAuthority("MANAGER", "OWNER")
-                .antMatchers("/api/employee/{id}/all").hasAuthority("MANAGER")
-                .antMatchers("/api/employee/{id}").hasAuthority("SELLER")
-                .antMatchers("/api/order/all").hasAnyAuthority("MANAGER")
-                .antMatchers("/api/order/new").hasAuthority("SELLER")
-                .antMatchers("/api/order/{id}").hasAuthority("SELLER")
+                .antMatchers("/api/").authenticated()
+
+//                .antMatchers("/api/branch/*").hasAuthority("OWNER")
+//                .antMatchers("/api/category/*").hasAuthority("OWNER")
+//                .antMatchers("/api/product/*").hasAuthority("OWNER")
+//                .antMatchers("/api/discount/*").hasAnyAuthority("OWNER")
+//                .antMatchers("/api/employee/*").hasAnyAuthority("OWNER","MANAGER")
+//                .antMatchers("/api/employee/{id}/all").hasAnyAuthority("OWNER","MANAGER")
+//                .antMatchers("/api/employee/{id}").hasAnyAuthority("OWNER","MANAGER")
+//                .antMatchers("/api/order/all").hasAnyAuthority("MANAGER")
+//                .antMatchers("/api/order/new").hasAuthority("SELLER")
+//                .antMatchers("/api/order/{id}").hasAuthority("SELLER")
 
                 .and().logout();
 //        http.cors();
