@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/order")
@@ -31,8 +32,23 @@ public class OrderAPI {
         return orderService.findOrderById(id);
     }
 
-    @PutMapping("/{id}")
-    public Order cancelOrder(Order order){
-        return orderService.cancelOrder(order);
+    @PutMapping("/cancel/{id}")
+    public Order cancelOrder(@PathVariable("id") String id){
+        return orderService.cancelOrder(id);
+    }
+
+    @GetMapping("/branch/all")
+    public List getOrderByBranch() {
+        return orderService.getOrdersInBranch();
+    }
+
+    @GetMapping("/{branchId}/{orderId}")
+    public Order findOrderByIdInBranch( @PathVariable("branchId")short branchId, @PathVariable("orderId") String orderId){
+        return orderService.findOrderByIdInBranch(branchId, orderId);
+    }
+
+    @GetMapping("/find/{ordinalNumber}")
+    public Optional<Order> findOrderByOrdinalNumber(@PathVariable("ordinalNumber") int ordinalNumber){
+        return orderService.findOrderByOrdinalNumber(ordinalNumber);
     }
 }

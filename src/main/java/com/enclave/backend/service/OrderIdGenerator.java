@@ -19,7 +19,7 @@ public class OrderIdGenerator {
     @Autowired
     private EmployeeServiceImpl employeeService;
 
-    private StringBuilder generateKey(Branch branch, Date date) {
+    public StringBuilder generateKey(Branch branch, Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyMMdd");
         String strDate = formatter.format(date);
         StringBuilder key = new StringBuilder(String.valueOf(String.format("%03d",branch.getId())));

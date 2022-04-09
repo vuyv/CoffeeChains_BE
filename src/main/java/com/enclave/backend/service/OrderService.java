@@ -5,6 +5,7 @@ import com.enclave.backend.entity.Order;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderService {
 
@@ -13,11 +14,15 @@ public interface OrderService {
 
     Order findOrderById(String id);
 
-    Order findOrderByOrdinalNumber(int ordinalNumber);
+    Optional<Order> findOrderByOrdinalNumber(int ordinalNumber);
 
-    Order cancelOrder(Order order);
+    Order cancelOrder(String id);
 
     boolean isValidTotal(OrderDTO orderDTO, double total);
 
     List<Order> getOrders();
+
+    List<Order> getOrdersInBranch();
+
+    Order findOrderByIdInBranch(short branchId, String orderId);
 }
