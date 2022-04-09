@@ -25,19 +25,20 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public Discount createDiscount(DiscountDTO discountDTO) {
         Discount discount = discountConverter.toEntity(discountDTO);
-        String generatedString = RandomStringUtils.randomAlphabetic(6);
-        discount.setCode(generatedString);
+//        String generatedString = RandomStringUtils.randomAlphabetic(6);
+//        discount.setCode(generatedString);
         return discountRepository.save(discount);
     }
 
     @Override
     public Discount updateDiscount(Discount discount) {
         Discount oldDiscount = discountRepository.findById(discount.getCode()).orElseThrow(() -> new IllegalArgumentException("Invalide discount code: " + discount.getCode()));
+        oldDiscount.setCode(discount.getCode());
         oldDiscount.setStartedAt(discount.getStartedAt());
         oldDiscount.setEndedAt(discount.getEndedAt());
         oldDiscount.setTitle(discount.getTitle());
         oldDiscount.setPercent(discount.getPercent());
-        oldDiscount.setStatus(discount.getStatus());
+//        oldDiscount.setStatus(discount.getStatus());
         return discountRepository.save(oldDiscount);
     }
 
@@ -78,4 +79,14 @@ public class DiscountServiceImpl implements DiscountService {
         List<Discount> discounts = discountRepository.getDiscountsByStatus(statusEnum);
         return discounts;
     }
+
+    @Override
+    public void deleteDiscount(String code) {
+        try {
+            discountRepository.deleteById(code);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
 }
