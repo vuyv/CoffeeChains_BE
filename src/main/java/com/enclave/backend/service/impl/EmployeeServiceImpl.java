@@ -60,9 +60,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee getCurrentEmployee() {
 //        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = currentUserName();
-        System.out.println(username);
-        Employee temp = employeeRepository.findByUsername(username);
-        System.out.println("Temp:" + temp.getUsername());
         return employeeRepository.findByUsername(username);
     }
 

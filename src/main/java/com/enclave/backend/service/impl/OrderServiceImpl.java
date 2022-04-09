@@ -5,10 +5,7 @@ import com.enclave.backend.converter.OrderDetailConverter;
 import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.dto.OrderDetailDTO;
 import com.enclave.backend.dto.ProductInOrderDTO;
-import com.enclave.backend.entity.Discount;
-import com.enclave.backend.entity.Order;
-import com.enclave.backend.entity.OrderDetail;
-import com.enclave.backend.entity.Product;
+import com.enclave.backend.entity.*;
 import com.enclave.backend.repository.OrderRepository;
 import com.enclave.backend.repository.ProductRepository;
 import com.enclave.backend.service.DiscountService;
@@ -20,10 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -158,36 +157,56 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order findOrderByOrdinalNumber(int ordinalNumber) {
-        List<Order> orders = orderRepository.findAll();
-        Order foundOrder = new Order();
-        orders.forEach(order -> {
-            if (order.getId().endsWith(String.valueOf(ordinalNumber))) {
-                foundOrder.setId(order.getId());
-                foundOrder.setDiscount(order.getDiscount());
-                foundOrder.setStatus(order.getStatus());
-                foundOrder.setTotalPrice(order.getTotalPrice());
-                foundOrder.setOrderDetails(order.getOrderDetails());
-                foundOrder.setCreatedAt(order.getCreatedAt());
-                foundOrder.setCanceledBy(order.getCanceledBy());
-                foundOrder.setCreatedBy(order.getCreatedBy());
-            } else {
-                throw new EntityNotFoundException("Order not found");
-            }
-        });
+    public Optional<Order> findOrderByOrdinalNumber(int ordinalNumber) {
+        Date currentDate = new Date();
+        StringBuilder key = orderIdGenerator.generateKey(employeeService.getCurrentEmployee().getBranch(), currentDate);
+        String orderId = String.valueOf(key.append(String.format("%03d", ordinalNumber)));
+        System.out.println(orderId);
+        return orderRepository.findById(orderId);
+    }
 
-        return foundOrder;
+    public boolean isSameDay(Date date1, Date date2) {
+        Instant instant1 = date1.toInstant().truncatedTo(ChronoUnit.DAYS);
+        Instant instant2 = date2.toInstant().truncatedTo(ChronoUnit.DAYS);
+        return instant1.equals(instant2);
     }
 
     @Override
-    public Order cancelOrder(Order order) {
-        Order oldOrder = findOrderById(order.getId());
-        oldOrder.setStatus(Order.Status.CANCELED);
+    public Order cancelOrder(String id) {
+        Order oldOrder = findOrderById(id);
+        Date currentDate = new Date();
+        if (isSameDay(currentDate, oldOrder.getCreatedAt())) {
+            if (oldOrder.getStatus().equals(Order.Status.CREATED)) {
+                oldOrder.setStatus(Order.Status.CANCELED);
+            }
+        }
         return orderRepository.save(oldOrder);
     }
 
     @Override
     public List<Order> getOrders() {
         return orderRepository.findAll();
+    }
+
+    @Override
+    public List<Order> getOrdersInBranch() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        return orderRepository.findByBranch(branchId);
+    }
+
+    @Override
+    public Order findOrderByIdInBranch(short branchId, String orderId) {
+        Date currentDate = new Date();
+        Order order = orderRepository.findOrderByIdInBranch(branchId, orderId);
+//        System.out.println(currentDate);
+//        System.out.println(order.getCreatedAt());
+        if (isSameDay(currentDate, order.getCreatedAt())) {
+            return order;
+        }
+//        System.out.println(isSameDay(currentDate, order.getCreatedAt()));
+//        System.out.println(currentDate);
+//        System.out.println(order.getCreatedAt());
+        throw new IllegalArgumentException("Not permission!");
     }
 }

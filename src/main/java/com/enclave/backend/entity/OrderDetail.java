@@ -3,15 +3,7 @@ package com.enclave.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.CascadeType;
-import javax.persistence.EmbeddedId;
-import javax.persistence.MapsId;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -36,4 +28,7 @@ public class OrderDetail{
 
     @Column
     private short quantity;
+
+//    @Column
+//    private double subTotal;
 }
