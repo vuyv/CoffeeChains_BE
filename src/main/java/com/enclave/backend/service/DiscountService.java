@@ -20,4 +20,6 @@ public interface DiscountService {
     Discount getDiscountWithDate(String code, Date currentDate);
 
     List<Discount> getDiscountsByStatus(String status);
+
+    void deleteDiscount(String id);
 }

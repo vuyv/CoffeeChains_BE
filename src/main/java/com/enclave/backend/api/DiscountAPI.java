@@ -4,6 +4,8 @@ import com.enclave.backend.dto.DiscountDTO;
 import com.enclave.backend.entity.Discount;
 import com.enclave.backend.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -46,5 +48,10 @@ public class DiscountAPI {
     @GetMapping("/status/{status}")
     public List<Discount> getDiscounstByStatus(@PathVariable("status") String status) {
         return discountService.getDiscountsByStatus(status);
+    }
+
+    @DeleteMapping("/{code}")
+    void deleteDiscount(@PathVariable("code") String code) {
+        discountService.deleteDiscount(code);
     }
 }
