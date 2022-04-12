@@ -77,6 +77,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Long getCountOfAllEmployee() {
+        return employeeRepository.count();
+    }
+
+    @Override
+    public int getCountOfBranchEmployee() {
+        Employee manager = getCurrentEmployee();
+        short branchId = manager.getBranch().getId();
+
+        return employeeRepository.getCountOfBranchEmployee(branchId);
+    }
+
+    @Override
     public Employee createEmployee(EmployeeDTO dto) {
         short branchId = dto.getBranchId();
         Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Invalid branch Id:" + branchId));
