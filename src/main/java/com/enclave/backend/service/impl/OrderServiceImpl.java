@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -48,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDetailConverter orderDetailConverter;
+
+    @Autowired
+    private DateUtil dateUtil;
 
     private List<ProductInOrderDTO> getListProductInFE(List<OrderDetailDTO> orderDetailDTOs) {
         List<ProductInOrderDTO> productsInFE = new ArrayList<>();
@@ -161,7 +165,6 @@ public class OrderServiceImpl implements OrderService {
         Date currentDate = new Date();
         StringBuilder key = orderIdGenerator.generateKey(employeeService.getCurrentEmployee().getBranch(), currentDate);
         String orderId = String.valueOf(key.append(String.format("%03d", ordinalNumber)));
-        System.out.println(orderId);
         return orderRepository.findById(orderId);
     }
 
@@ -175,10 +178,9 @@ public class OrderServiceImpl implements OrderService {
     public Order cancelOrder(String id) {
         Order oldOrder = findOrderById(id);
         Date currentDate = new Date();
-        if (isSameDay(currentDate, oldOrder.getCreatedAt())) {
-            if (oldOrder.getStatus().equals(Order.Status.CREATED)) {
-                oldOrder.setStatus(Order.Status.CANCELED);
-            }
+        if (isSameDay(currentDate, oldOrder.getCreatedAt()) && oldOrder.getStatus().equals(Order.Status.CREATED)) {
+            oldOrder.setStatus(Order.Status.CANCELED);
+            oldOrder.setCanceledBy(employeeService.getCurrentEmployee());
         }
         return orderRepository.save(oldOrder);
     }
@@ -199,14 +201,24 @@ public class OrderServiceImpl implements OrderService {
     public Order findOrderByIdInBranch(short branchId, String orderId) {
         Date currentDate = new Date();
         Order order = orderRepository.findOrderByIdInBranch(branchId, orderId);
-//        System.out.println(currentDate);
-//        System.out.println(order.getCreatedAt());
-        if (isSameDay(currentDate, order.getCreatedAt())) {
-            return order;
-        }
-//        System.out.println(isSameDay(currentDate, order.getCreatedAt()));
-//        System.out.println(currentDate);
-//        System.out.println(order.getCreatedAt());
-        throw new IllegalArgumentException("Not permission!");
+        return order;
+    }
+
+    @Override
+    public List<Order> findOrdersInCurrentDayInBranch() {
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentDay(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        return orders;
+    }
+
+    @Override
+    public List<Order> findOrdersInAWeekInBranch() {
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentWeek(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        return orders;
+    }
+
+    @Override
+    public List<Order> findOrdersInAMonthInBranch() {
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentMonth(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        return orders;
     }
 }

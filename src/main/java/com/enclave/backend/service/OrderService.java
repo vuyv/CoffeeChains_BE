@@ -25,4 +25,10 @@ public interface OrderService {
     List<Order> getOrdersInBranch();
 
     Order findOrderByIdInBranch(short branchId, String orderId);
+
+    List<Order> findOrdersInCurrentDayInBranch();
+
+    List<Order> findOrdersInAWeekInBranch();
+
+    List<Order> findOrdersInAMonthInBranch();
 }

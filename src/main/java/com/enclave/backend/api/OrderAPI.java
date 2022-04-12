@@ -51,4 +51,19 @@ public class OrderAPI {
     public Optional<Order> findOrderByOrdinalNumber(@PathVariable("ordinalNumber") int ordinalNumber){
         return orderService.findOrderByOrdinalNumber(ordinalNumber);
     }
+
+    @GetMapping("/branch/find/day")
+    List<Order> findOrdersInCurrentDayInBranch(){
+        return orderService.findOrdersInCurrentDayInBranch();
+    }
+
+    @GetMapping("branch/find/week")
+    List<Order> findOrdersInAWeekInBranch(){
+        return orderService.findOrdersInAWeekInBranch();
+    }
+
+    @GetMapping("branch/find/month")
+    List<Order> findOrdersInAMonthInBranch(){
+        return orderService.findOrdersInAMonthInBranch();
+    }
 }
