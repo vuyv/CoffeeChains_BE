@@ -61,4 +61,14 @@ public class EmployeeAPI {
     public Employee changePassword(@PathVariable("id") short id, @RequestBody PasswordDTO passwordDTO){
         return employeeService.changePassword(id, passwordDTO);
     }
+
+    @GetMapping("/countAll")
+    public Long getCountOfAllEmployee(){
+        return employeeService.getCountOfAllEmployee();
+    }
+
+    @GetMapping("/countOfBranch")
+    public int getCountOfBranchEmployee(){
+        return employeeService.getCountOfBranchEmployee();
+    }
 }

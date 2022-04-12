@@ -27,4 +27,8 @@ public interface EmployeeService extends UserDetailsService {
     Employee getCurrentEmployee();
 
     Employee changePassword(short id, PasswordDTO passwordDTO);
+
+    Long getCountOfAllEmployee();
+
+    int getCountOfBranchEmployee();
 }

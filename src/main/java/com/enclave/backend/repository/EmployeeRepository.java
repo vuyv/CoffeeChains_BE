@@ -18,4 +18,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Short> {
 
     @Query("SELECT e FROM Employee e WHERE e.branch.id= :branchId")
     List<Employee> findByBranch(@Param("branch") short branchId);
+
+    @Query("SELECT COUNT(e) FROM Employee e WHERE e.branch.id= :branchId")
+    int getCountOfBranchEmployee(@Param("branch") short branchId);
 }
