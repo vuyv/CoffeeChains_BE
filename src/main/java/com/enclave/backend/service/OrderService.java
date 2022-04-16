@@ -11,7 +11,6 @@ public interface OrderService {
 
     ResponseEntity<Order> createNewOrder(OrderDTO orderDTO);
 
-
     Order findOrderById(String id);
 
     Optional<Order> findOrderByOrdinalNumber(int ordinalNumber);
