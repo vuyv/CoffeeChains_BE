@@ -18,4 +18,6 @@ public interface ProductService {
     List<Product> findByCategory(short categoryId);
 
     Product disableProduct(short id);
+
+    Long countAllProduct();
 }
