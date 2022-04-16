@@ -17,12 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -221,4 +220,98 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentMonth(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
         return orders;
     }
+
+
+
+
+    //manager
+    @Override
+    public List<Object[]> getCountOfTotalPriceInBranchWeekly() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(Calendar.DAY_OF_MONTH, -8);
+        Date sevenDaysBefore = calendar.getTime();
+
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, sevenDaysBefore);
+
+
+        return queryResult;
+    }
+
+    @Override
+    public int getCountOfBranchOrderByDate(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        int count = 0;
+        try {
+            count = orderRepository.getCountOfBranchOrderByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return count;
+    }
+
+    @Override
+    public double getCountOfBranchTotalPriceByDate(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        double count = 0;
+        try {
+            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return count;
+    }
+
+
+    //owner
+    @Override
+    public double getCountOfAllTotalPriceByDate(String date) {
+        double count = 0;
+        try {
+            count = orderRepository.getCountOfAllTotalPriceByDate(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+    return count;
+    }
+
+    @Override
+    public Integer getCountOfAllOrderByDate(String date) {
+        int count = 0;
+        try {
+            count = orderRepository.getCountOfAllOrderByDate(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return count;
+    }
+
+    @Override
+    public List<Object[]> getCountOfOrderEachBranch(String date) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getCountOfOrderEachBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getCountOfTotalPriceEachBranch(String date) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getCountOfTotalPriceEachBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+
 }

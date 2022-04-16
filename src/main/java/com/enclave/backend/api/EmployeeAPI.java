@@ -67,6 +67,7 @@ public class EmployeeAPI {
         return employeeService.getCountOfAllEmployee();
     }
 
+    //manager
     @GetMapping("/countOfBranch")
     public int getCountOfBranchEmployee(){
         return employeeService.getCountOfBranchEmployee();
