@@ -5,10 +5,11 @@ import com.enclave.backend.entity.Order;
 import com.enclave.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/order")
@@ -63,7 +64,44 @@ public class OrderAPI {
     }
 
     @GetMapping("branch/find/month")
-    List<Order> findOrdersInAMonthInBranch(){
+    public List<Order> findOrdersInAMonthInBranch(){
         return orderService.findOrdersInAMonthInBranch();
+    }
+
+    //manager
+    @GetMapping("/branch/count/orderByday/{date}")
+    public Integer getCountOfBranchOrderByDate(@PathVariable ("date") String date){
+        return orderService.getCountOfBranchOrderByDate(date);
+    }
+
+    @GetMapping("/branch/count/totalPriceByday/{date}")
+    double getCountOfBranchTotalPriceByDate(@PathVariable ("date") String date){
+        return orderService.getCountOfBranchTotalPriceByDate(date);
+    }
+    @GetMapping("/branch/count/lastweek")
+    public List<Object[]> getCountOfTotalPriceInBranchWeekly(){
+        return orderService.getCountOfTotalPriceInBranchWeekly();
+    }
+
+
+    //owner
+    @GetMapping("/owner/count/orderByday/{date}")
+    public Integer getCountOfAllOrderByDate(@PathVariable("date") String date){
+        return orderService.getCountOfAllOrderByDate(date);
+    }
+
+    @GetMapping("/owner/count/totalPriceByday/{date}")
+    public double getCountOfAllTotalPriceByDate(@PathVariable("date") String date){
+        return orderService.getCountOfAllTotalPriceByDate(date);
+    }
+
+    @GetMapping("/owner/count/ordersByday/eachBranch/{date}")
+    public List<Object[]> getCountOfOrderEachBranch(@PathVariable("date") String date){
+        return orderService.getCountOfOrderEachBranch(date);
+    }
+
+    @GetMapping("/owner/count/totalPriceByday/eachBranch/{date}")
+    public List<Object[]> getCountOfTotalPriceEachBranch(@PathVariable("date") String date){
+        return orderService.getCountOfTotalPriceEachBranch(date);
     }
 }

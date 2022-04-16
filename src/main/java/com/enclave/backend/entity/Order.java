@@ -1,18 +1,11 @@
 package com.enclave.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.OneToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
-import javax.persistence.CascadeType;
-import javax.persistence.Enumerated;
-import javax.persistence.EnumType;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +26,8 @@ public class Order {
     private double totalPrice;
 
     @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(style = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
 //    @JsonIgnore

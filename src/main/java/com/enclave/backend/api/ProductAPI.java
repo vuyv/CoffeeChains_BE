@@ -45,4 +45,9 @@ public class ProductAPI {
     public Product disableProduct(@PathVariable("id") short id){
         return productService.disableProduct(id);
     }
+
+    @GetMapping("/countAll")
+    public Long countAllProduct(){
+        return productService.countAllProduct();
+    }
 }
