@@ -2,11 +2,16 @@ package com.enclave.backend.api;
 
 import com.enclave.backend.dto.EmployeeDTO;
 import com.enclave.backend.dto.PasswordDTO;
+import com.enclave.backend.dto.PasswordResetDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.service.EmployeeService;
+import com.enclave.backend.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,9 +22,16 @@ public class EmployeeAPI {
     @Autowired
     private EmployeeService employeeService;
 
+    @Autowired
+    private OTPService otpService;
+
     @PostMapping("/new")
-    public Employee createEmployee(@RequestBody EmployeeDTO dto) {
-        return employeeService.createEmployee(dto);
+    public ResponseEntity <Employee> createEmployee(@RequestBody EmployeeDTO dto) {
+        try{
+            return new ResponseEntity<>(employeeService.createEmployee(dto), HttpStatus.OK);
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't create employee", e);
+        }
     }
 
     @GetMapping("/{id}")
@@ -72,4 +84,27 @@ public class EmployeeAPI {
     public int getCountOfBranchEmployee(){
         return employeeService.getCountOfBranchEmployee();
     }
+
+    @GetMapping("/find/{phone}")
+    public ResponseEntity <Employee> getEmployeeByPhone(@PathVariable("phone") String phone) {
+        try{
+            return new ResponseEntity<>(employeeService.getEmployeeByPhone(phone), HttpStatus.OK) ;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Phone number doesn't exist.", e);
+        }
+    }
+
+    @PutMapping("reset_password/{phone}")
+    public ResponseEntity<Employee> resetPassword(@PathVariable("phone") String phone, @RequestBody PasswordResetDTO passwordResetDTO){
+        try{
+            return new ResponseEntity<>(employeeService.resetPassword(phone, passwordResetDTO), HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't reset password", e);
+        }
+    }
+
+//    @GetMapping("/send_otp/{phone}")
+//    public void sendOtp(@PathVariable("phone") String phone) throws FirebaseAuthException, ExecutionException, InterruptedException {
+//        otpService.sendOtp(phone);
+//    }
 }

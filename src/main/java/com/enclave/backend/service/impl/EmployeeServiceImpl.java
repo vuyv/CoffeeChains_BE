@@ -2,13 +2,12 @@ package com.enclave.backend.service.impl;
 
 import com.enclave.backend.converter.EmployeeConverter;
 import com.enclave.backend.converter.PasswordConverter;
+import com.enclave.backend.converter.PasswordResetConverter;
 import com.enclave.backend.dto.EmployeeDTO;
 import com.enclave.backend.dto.PasswordDTO;
+import com.enclave.backend.dto.PasswordResetDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
-import com.enclave.backend.entity.Branch;
-import com.enclave.backend.entity.Employee;
-import com.enclave.backend.entity.Password;
-import com.enclave.backend.entity.Role;
+import com.enclave.backend.entity.*;
 import com.enclave.backend.jwt.CustomUserDetails;
 import com.enclave.backend.repository.BranchRepository;
 import com.enclave.backend.repository.EmployeeRepository;
@@ -47,6 +46,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private PasswordConverter passwordConverter;
+
+    @Autowired
+    private PasswordResetConverter passwordResetConverter;
 
     public Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
@@ -165,6 +167,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         newEmployee.setStatus(Employee.Status.ACTIVE);
         employeeRepository.save(newEmployee);
         return employeeRepository.save(newEmployee);
+    }
+
+    @Override
+    public Employee getEmployeeByPhone(String phone) {
+        return employeeRepository.findByPhone(phone).orElseThrow(() -> new IllegalArgumentException("Invalid phone number:" + phone));
+    }
+
+    @Override
+    public Employee resetPassword(String phone, PasswordResetDTO passwordResetDTO) {
+        Employee employee = employeeRepository.findByPhone(phone).orElseThrow(() -> new IllegalArgumentException("Invalid phone number:" + phone));
+        PasswordReset password = passwordResetConverter.toEntity(passwordResetDTO);
+        if (password.getPassword().equals(password.getConfirmPassword())) {
+            employee.setPassword(passwordEncode.encode(password.getConfirmPassword()));
+            employeeRepository.save(employee);
+        }
+        return employee;
     }
 
     @Override

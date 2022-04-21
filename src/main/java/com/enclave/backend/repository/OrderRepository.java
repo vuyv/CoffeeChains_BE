@@ -1,17 +1,13 @@
 package com.enclave.backend.repository;
 
-import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Order;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-
-import static org.hibernate.loader.Loader.SELECT;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String> {
@@ -39,10 +35,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT Sum(total_price) FROM Orders WHERE (DATE(created_at)) = DATE(:date) ", nativeQuery = true)
     double getCountOfAllTotalPriceByDate(@Param("date") Date date);
 
-    @Query(value = "  SELECT branch.name,count(*) FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name;\n", nativeQuery = true)
+    @Query(value = "SELECT branch.name,count(*) FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name;\n", nativeQuery = true)
     List<Object[]> getCountOfOrderEachBranch(@Param("date") Date date);
 
-    @Query(value = "  SELECT branch.name,sum(orders.total_price) FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name;\n", nativeQuery = true)
+    @Query(value = "SELECT branch.name,sum(orders.total_price) FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name;\n", nativeQuery = true)
     List<Object[]> getCountOfTotalPriceEachBranch(@Param("date") Date date);
 
 

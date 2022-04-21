@@ -2,6 +2,7 @@ package com.enclave.backend.service;
 
 import com.enclave.backend.dto.EmployeeDTO;
 import com.enclave.backend.dto.PasswordDTO;
+import com.enclave.backend.dto.PasswordResetDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,4 +32,8 @@ public interface EmployeeService extends UserDetailsService {
     Long getCountOfAllEmployee();
 
     int getCountOfBranchEmployee();
+
+    Employee getEmployeeByPhone(String phone);
+
+    Employee resetPassword(String phone, PasswordResetDTO passwordResetDTO);
 }
