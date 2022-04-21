@@ -51,5 +51,19 @@ public interface OrderService {
 
     List<Object[]> getCountOfTotalPriceEachBranch(String date);
 
+    double compareLastMonthRevenue();
+
+    double compareLastWeekRevenue();
+
+    List<Object[]> topWeeklySeller();
+
+    double getCurrentMonthRevenue();
+
+    double getCurrentWeekRevenue();
+
+    List<Object[]> getBestSellingProducts();
+
+    //Report
+    List<Object[]> getDailyRevenueAllBranch();
 
 }

@@ -33,6 +33,8 @@ public interface EmployeeService extends UserDetailsService {
 
     int getCountOfBranchEmployee();
 
+    List<Object[]> getCountOfEmployeeEachBranch();
+
     Employee getEmployeeByPhone(String phone);
 
     Employee resetPassword(String phone, PasswordResetDTO passwordResetDTO);

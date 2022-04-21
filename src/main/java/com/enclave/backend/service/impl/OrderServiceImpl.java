@@ -130,7 +130,7 @@ public class OrderServiceImpl implements OrderService {
         });
         newOrder.setOrderDetails(orderDetails);
 
-        if (orderDTO.getDiscount_code() != "") {
+        if (orderDTO.getDiscount_code() != "" ) {
             total = applyDiscountCode(total, orderDTO.getDiscount_code(), date);
             if (isValidTotal(orderDTO, total)) {
                 newOrder.setDiscount(discountService.getDiscountByCode(orderDTO.getDiscount_code()));
@@ -307,6 +307,67 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {
             queryResult = orderRepository.getCountOfTotalPriceEachBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public double compareLastMonthRevenue() {
+        double lastMonthRevenue = orderRepository.getLastMonthRevenue();
+        double currentMonthRevenue = orderRepository.getCurrentMonthRevenue();
+        double compare = currentMonthRevenue - lastMonthRevenue;
+        return compare;
+    }
+
+    @Override
+    public double compareLastWeekRevenue() {
+        double lastWeekRevenue = orderRepository.getLastWeekRevenue();
+        double currentWeekRevenue = orderRepository.getCurrentWeekRevenue();
+        double compare = currentWeekRevenue - lastWeekRevenue;
+        return compare;
+    }
+
+    @Override
+    public List<Object[]> topWeeklySeller() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.topWeeklySeller();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;    }
+
+    @Override
+    public double getCurrentMonthRevenue() {
+        return orderRepository.getCurrentMonthRevenue();
+    }
+
+    @Override
+    public double getCurrentWeekRevenue() {
+        return orderRepository.getCurrentWeekRevenue();
+    }
+
+    @Override
+    public List<Object[]> getBestSellingProducts() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getBestSellingProducts(branchId);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getDailyRevenueAllBranch() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getDailyRevenueAllBranch();
         } catch (Exception e){
             System.out.println(e);
         }

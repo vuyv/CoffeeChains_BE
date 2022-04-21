@@ -23,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +91,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         short branchId = manager.getBranch().getId();
 
         return employeeRepository.getCountOfBranchEmployee(branchId);
+    }
+
+    @Override
+    public List<Object[]> getCountOfEmployeeEachBranch() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = employeeRepository.getCountOfEmployeeEachBranch();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+
     }
 
     @Override

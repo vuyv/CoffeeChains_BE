@@ -69,6 +69,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     public Discount getDiscountWithDate(String code, Date currentDate) {
+        System.out.println("DISCOUNT: " + code);
         Discount discount = discountRepository.findById(code).orElseThrow(() -> new IllegalArgumentException("Invalid discount code: " + code));
         return discount.getStartedAt().compareTo(currentDate) * currentDate.compareTo(discount.getEndedAt()) >= 0 ? discount : null;
     }
