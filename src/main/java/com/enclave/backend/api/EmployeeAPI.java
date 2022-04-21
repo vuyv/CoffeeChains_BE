@@ -62,14 +62,22 @@ public class EmployeeAPI {
         return employeeService.changePassword(id, passwordDTO);
     }
 
-    @GetMapping("/countAll")
-    public Long getCountOfAllEmployee(){
-        return employeeService.getCountOfAllEmployee();
-    }
+
 
     //manager
     @GetMapping("/countOfBranch")
     public int getCountOfBranchEmployee(){
         return employeeService.getCountOfBranchEmployee();
+    }
+
+    //owner
+    @GetMapping("/countAll")
+    public Long getCountOfAllEmployee(){
+        return employeeService.getCountOfAllEmployee();
+    }
+
+    @GetMapping("/count/eachBranch")
+    public List<Object[]> getCountOfEmployeeEachBranch(){
+        return employeeService.getCountOfEmployeeEachBranch();
     }
 }

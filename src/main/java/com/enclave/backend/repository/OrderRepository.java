@@ -45,5 +45,25 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "  SELECT branch.name,sum(orders.total_price) FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name;\n", nativeQuery = true)
     List<Object[]> getCountOfTotalPriceEachBranch(@Param("date") Date date);
 
+    @Query(value = "SELECT sum(orders.total_price) FROM orders where month(orders.created_at) = month(now()) -1", nativeQuery = true)
+    double getLastMonthRevenue();
 
+    @Query(value = "SELECT sum(orders.total_price) FROM orders where month(orders.created_at) = month(now())", nativeQuery = true)
+    double getCurrentMonthRevenue();
+
+    @Query(value = "SELECT sum(orders.total_price) FROM orders where week(orders.created_at)=week(now())-1", nativeQuery = true)
+    double getLastWeekRevenue();
+
+    @Query(value = "SELECT sum(orders.total_price) FROM orders where week(orders.created_at)=week(now())", nativeQuery = true)
+    double getCurrentWeekRevenue();
+
+    @Query(value = "SELECT branch.name,sum(orders.total_price) AS TOTAL FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND  week(orders.created_at)=week(now()) group by branch.name ORDER BY TOTAL DESC LIMIT 6", nativeQuery = true)
+    List<Object[]> topWeeklySeller();
+
+    @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY FROM order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN employee on orders.created_by = employee.id JOIN branch on employee.branch_id = branch.id where employee.branch_id = :branchId AND week(orders.created_at)=week(now()) group by product.name order by QUANTITY desc", nativeQuery = true)
+    List<Object[]> getBestSellingProducts(@Param("branchId") short branchId);
+
+    //Report
+    @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(now()) group by branch.name", nativeQuery = true)
+    List<Object[]> getDailyRevenueAllBranch();
 }

@@ -82,7 +82,10 @@ public class OrderAPI {
     public List<Object[]> getCountOfTotalPriceInBranchWeekly(){
         return orderService.getCountOfTotalPriceInBranchWeekly();
     }
-
+    @GetMapping("/manager/bestSellingProducts")
+    public List<Object[]> getBestSellingProducts(){
+        return orderService.getBestSellingProducts();
+    }
 
     //owner
     @GetMapping("/owner/count/orderByday/{date}")
@@ -104,4 +107,36 @@ public class OrderAPI {
     public List<Object[]> getCountOfTotalPriceEachBranch(@PathVariable("date") String date){
         return orderService.getCountOfTotalPriceEachBranch(date);
     }
+
+    @GetMapping("/owner/compare/lastMonth")
+    public double compareLastMonthRevenue(){
+        return orderService.compareLastMonthRevenue();
+    }
+
+    @GetMapping("/owner/compare/lastWeek")
+    public double compareLastWeekRevenue(){
+        return orderService.compareLastWeekRevenue();
+    }
+
+    @GetMapping("/owner/topSeller/weekly")
+    public List<Object[]> topWeeklySeller(){
+        return orderService.topWeeklySeller();
+    }
+
+    @GetMapping("/owner/revenue/currentMonth")
+    public double getCurrentMonthRevenue(){
+        return orderService.getCurrentMonthRevenue();
+    }
+
+    @GetMapping("/owner/revenue/currentWeek")
+    public double getCurrentWeekRevenue(){
+        return orderService.getCurrentWeekRevenue();
+    }
+
+    //Report
+    @GetMapping("/owner/report/revenue/daily/allBranch")
+    public List<Object[]> getDailyRevenueAllBranch(){
+        return orderService.getDailyRevenueAllBranch();
+    }
+
 }
