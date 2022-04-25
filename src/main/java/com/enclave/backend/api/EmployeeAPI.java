@@ -94,6 +94,11 @@ public class EmployeeAPI {
         }
     }
 
+    @GetMapping("/count/eachBranch")
+    public List<Object[]> getCountOfEmployeeEachBranch(){
+        return employeeService.getCountOfEmployeeEachBranch();
+    }
+
     @PutMapping("reset_password/{phone}")
     public ResponseEntity<Employee> resetPassword(@PathVariable("phone") String phone, @RequestBody PasswordResetDTO passwordResetDTO){
         try{
@@ -103,8 +108,4 @@ public class EmployeeAPI {
         }
     }
 
-//    @GetMapping("/send_otp/{phone}")
-//    public void sendOtp(@PathVariable("phone") String phone) throws FirebaseAuthException, ExecutionException, InterruptedException {
-//        otpService.sendOtp(phone);
-//    }
 }

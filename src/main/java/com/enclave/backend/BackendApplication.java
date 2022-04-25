@@ -17,6 +17,14 @@ public class BackendApplication {
 //                .setCredentials(googleCredentials)
 //                .build();
 //        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions);
+//        DateUtil dateUtil = new DateUtil();
+//        try {
+//            Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2022-04-22");
+//            System.out.println("--------Start " + dateUtil.startOfMonth(date));
+//            System.out.println("--------End " + dateUtil.endOfMonth(date));
+//        } catch (Exception e){
+//            System.out.println(e);
+//        }
         SpringApplication.run(BackendApplication.class, args);
     }
 }

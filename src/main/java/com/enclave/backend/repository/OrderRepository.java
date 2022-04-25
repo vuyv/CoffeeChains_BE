@@ -62,4 +62,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     //Report
     @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(now()) group by branch.name", nativeQuery = true)
     List<Object[]> getDailyRevenueAllBranch();
+
+    @Query(value = "SELECT count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(now()) group by branch.name", nativeQuery = true)
+    List<Object[]> getDailyRevenueEachBranch();
 }

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -221,9 +220,6 @@ public class OrderServiceImpl implements OrderService {
         return orders;
     }
 
-
-
-
     //manager
     @Override
     public List<Object[]> getCountOfTotalPriceInBranchWeekly() {
@@ -373,6 +369,4 @@ public class OrderServiceImpl implements OrderService {
         }
         return queryResult;
     }
-
-
 }
