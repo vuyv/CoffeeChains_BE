@@ -66,4 +66,39 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     //Report
     @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(now()) group by branch.name", nativeQuery = true)
     List<Object[]> getDailyRevenueAllBranch();
+
+    @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (WEEK(orders.created_at)) = WEEK(now()) group by branch.name", nativeQuery = true)
+    List<Object[]> getWeeklyRevenueAllBranch();
+
+    @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (MONTH(orders.created_at)) = MONTH(now()) group by branch.name", nativeQuery = true)
+    List<Object[]> getMonthlyRevenueAllBranch();
+
+    @Query(value = "SELECT category.name, sum(order_detail.quantity),sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id WHERE (DATE(orders.created_at)) = DATE(now()) group by category.name;", nativeQuery = true)
+    List<Object[]> getDailyProductAllCategory();
+
+    @Query(value = "SELECT category.name, sum(order_detail.quantity),sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id WHERE (WEEK(orders.created_at)) = WEEK(now()) group by category.name;", nativeQuery = true)
+    List<Object[]> getWeeklyProductAllCategory();
+
+    @Query(value = "SELECT category.name, sum(order_detail.quantity),sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id WHERE (MONTH(orders.created_at)) = MONTH(now()) group by category.name;", nativeQuery = true)
+    List<Object[]> getMonthlyProductAllCategory();
+
+    //EachCategory
+    @Query(value = "SELECT product.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id  WHERE (DATE(orders.created_at)) = DATE(now()) AND product.category_id=:categoryId group by product.name;", nativeQuery = true)
+    List<Object[]> getDailyProductByCategory(@Param("categoryId") short categoryId);
+
+    @Query(value = "SELECT product.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id  WHERE (WEEK(orders.created_at)) = WEEK(now()) AND product.category_id=:categoryId group by product.name;", nativeQuery = true)
+    List<Object[]> getWeeklyProductByCategory(@Param("categoryId") short categoryId);
+
+    @Query(value = "SELECT product.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id  WHERE (MONTH(orders.created_at)) = MONTH(now()) AND product.category_id=:categoryId group by product.name;", nativeQuery = true)
+    List<Object[]> getMonthlyProductByCategory(@Param("categoryId") short categoryId);
+
+    //DatePicker
+    @Query(value="SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (DATE(orders.created_at)) = DATE(:date) group by branch.name", nativeQuery = true)
+    List<Object[]> getCustomDailyRevenueAllBranch(@Param("date") Date date);
+
+    @Query(value="SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (WEEK(orders.created_at)) = WEEK(:date) group by branch.name", nativeQuery = true)
+    List<Object[]> getCustomWeeklyRevenueAllBranch(@Param("date") Date date);
+
+    @Query(value="SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND (MONTH(orders.created_at)) = MONTH(:date) group by branch.name", nativeQuery = true)
+    List<Object[]> getCustomMonthlyRevenueAllBranch(@Param("date") Date date);
 }

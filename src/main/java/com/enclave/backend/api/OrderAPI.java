@@ -133,10 +133,70 @@ public class OrderAPI {
         return orderService.getCurrentWeekRevenue();
     }
 
-    //Report
+    //REPORT
+    //REVENUE
+    //AllBranch
     @GetMapping("/owner/report/revenue/daily/allBranch")
     public List<Object[]> getDailyRevenueAllBranch(){
         return orderService.getDailyRevenueAllBranch();
     }
 
+    @GetMapping("/owner/report/revenue/weekly/allBranch")
+    public List<Object[]> getWeeklyRevenueAllBranch(){
+        return orderService.getWeeklyRevenueAllBranch();
+    }
+
+    @GetMapping("/owner/report/revenue/monthly/allBranch")
+    public List<Object[]> getMonthlyRevenueAllBranch(){
+        return orderService.getMonthlyRevenueAllBranch();
+    }
+
+    //PRODUCT
+    //AllCategory
+    @GetMapping("/owner/report/product/daily/allCategory")
+    public List<Object[]> getDailyProductAllCategory(){
+        return orderService.getDailyProductAllCategory();
+    }
+
+    @GetMapping("/owner/report/product/weekly/allCategory")
+    public List<Object[]> getWeeklyProductAllCategory(){
+        return orderService.getWeeklyProductAllCategory();
+    }
+
+    @GetMapping("/owner/report/product/monthly/allCategory")
+    public List<Object[]> getMonthlyProductAllCategory(){
+        return orderService.getMonthlyProductAllCategory();
+    }
+
+    //EachCategory
+    @GetMapping("/owner/report/product/daily/category/{id}")
+    public List<Object[]> getDailyProductByCategory(@PathVariable("id") short id){
+        return orderService.getDailyProductByCategory(id);
+    }
+
+    @GetMapping("/owner/report/product/weekly/category/{id}")
+    public List<Object[]> getWeeklyProductByCategory(@PathVariable("id") short id){
+        return orderService.getWeeklyProductByCategory(id);
+    }
+
+    @GetMapping("/owner/report/product/monthly/category/{id}")
+    public List<Object[]> getMonthlyProductByCategory(@PathVariable("id") short id){
+        return orderService.getMonthlyProductByCategory(id);
+    }
+
+    //CUSTOM DATE
+    @GetMapping("/owner/report/revenue/allBranch/customDaily/{date}")
+    public List<Object[]> getCustomDailyRevenueAllBranch(@PathVariable("date") String date){
+        return orderService.getCustomDailyRevenueAllBranch(date);
+    }
+
+    @GetMapping("/owner/report/revenue/allBranch/customWeekly/{date}")
+    public List<Object[]> getCustomWeeklyRevenueAllBranch(@PathVariable("date") String date){
+        return orderService.getCustomWeeklyRevenueAllBranch(date);
+    }
+
+    @GetMapping("/owner/report/revenue/allBranch/customMonthly/{date}")
+    public List<Object[]> getCustomMonthlyRevenueAllBranch(@PathVariable("date") String date){
+        return orderService.getCustomMonthlyRevenueAllBranch(date);
+    }
 }

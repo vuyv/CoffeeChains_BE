@@ -3,6 +3,7 @@ package com.enclave.backend.service;
 import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Order;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -64,7 +65,33 @@ public interface OrderService {
 
     List<Object[]> getBestSellingProducts();
 
-    //Report
+    //REPORT
+    //revenue
     List<Object[]> getDailyRevenueAllBranch();
+
+    List<Object[]> getWeeklyRevenueAllBranch();
+
+    List<Object[]> getMonthlyRevenueAllBranch();
+
+    //product
+    List<Object[]> getDailyProductAllCategory();
+
+    List<Object[]> getWeeklyProductAllCategory();
+
+    List<Object[]> getMonthlyProductAllCategory();
+
+    List<Object[]> getDailyProductByCategory(short categoryId);
+
+    List<Object[]> getWeeklyProductByCategory(short categoryId);
+
+    List<Object[]> getMonthlyProductByCategory(short categoryId);
+
+
+
+    List<Object[]> getCustomDailyRevenueAllBranch(String date);
+
+    List<Object[]> getCustomWeeklyRevenueAllBranch(String date);
+
+    List<Object[]> getCustomMonthlyRevenueAllBranch(String date);
 
 }

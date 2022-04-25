@@ -374,5 +374,123 @@ public class OrderServiceImpl implements OrderService {
         return queryResult;
     }
 
+    @Override
+    public List<Object[]> getWeeklyRevenueAllBranch() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getWeeklyRevenueAllBranch();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getMonthlyRevenueAllBranch() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getMonthlyRevenueAllBranch();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;    }
+
+    @Override
+    public List<Object[]> getDailyProductAllCategory() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getDailyProductAllCategory();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;    }
+
+    @Override
+    public List<Object[]> getWeeklyProductAllCategory() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getWeeklyProductAllCategory();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getMonthlyProductAllCategory() {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getMonthlyProductAllCategory();
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getDailyProductByCategory(short categoryId) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getDailyProductByCategory(categoryId);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;    }
+
+    @Override
+    public List<Object[]> getWeeklyProductByCategory(short categoryId) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getWeeklyProductByCategory(categoryId);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getMonthlyProductByCategory(short categoryId) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getMonthlyProductByCategory(categoryId);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getCustomDailyRevenueAllBranch(String date) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getCustomDailyRevenueAllBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getCustomWeeklyRevenueAllBranch(String date) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getCustomWeeklyRevenueAllBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getCustomMonthlyRevenueAllBranch(String date) {
+        List<Object[]> queryResult = new ArrayList<Object[]>();
+        try {
+            queryResult = orderRepository.getCustomMonthlyRevenueAllBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
 
 }
