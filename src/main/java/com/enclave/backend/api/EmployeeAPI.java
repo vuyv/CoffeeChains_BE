@@ -2,11 +2,16 @@ package com.enclave.backend.api;
 
 import com.enclave.backend.dto.EmployeeDTO;
 import com.enclave.backend.dto.PasswordDTO;
+import com.enclave.backend.dto.PasswordResetDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
 import com.enclave.backend.entity.Employee;
 import com.enclave.backend.service.EmployeeService;
+import com.enclave.backend.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,9 +22,16 @@ public class EmployeeAPI {
     @Autowired
     private EmployeeService employeeService;
 
+    @Autowired
+    private OTPService otpService;
+
     @PostMapping("/new")
-    public Employee createEmployee(@RequestBody EmployeeDTO dto) {
-        return employeeService.createEmployee(dto);
+    public ResponseEntity <Employee> createEmployee(@RequestBody EmployeeDTO dto) {
+        try{
+            return new ResponseEntity<>(employeeService.createEmployee(dto), HttpStatus.OK);
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't create employee", e);
+        }
     }
 
     @GetMapping("/{id}")
@@ -62,7 +74,10 @@ public class EmployeeAPI {
         return employeeService.changePassword(id, passwordDTO);
     }
 
-
+    @GetMapping("/countAll")
+    public Long getCountOfAllEmployee(){
+        return employeeService.getCountOfAllEmployee();
+    }
 
     //manager
     @GetMapping("/countOfBranch")
@@ -70,14 +85,27 @@ public class EmployeeAPI {
         return employeeService.getCountOfBranchEmployee();
     }
 
-    //owner
-    @GetMapping("/countAll")
-    public Long getCountOfAllEmployee(){
-        return employeeService.getCountOfAllEmployee();
+    @GetMapping("/find/{phone}")
+    public ResponseEntity <Employee> getEmployeeByPhone(@PathVariable("phone") String phone) {
+        try{
+            return new ResponseEntity<>(employeeService.getEmployeeByPhone(phone), HttpStatus.OK) ;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Phone number doesn't exist.", e);
+        }
     }
 
     @GetMapping("/count/eachBranch")
     public List<Object[]> getCountOfEmployeeEachBranch(){
         return employeeService.getCountOfEmployeeEachBranch();
     }
+
+    @PutMapping("reset_password/{phone}")
+    public ResponseEntity<Employee> resetPassword(@PathVariable("phone") String phone, @RequestBody PasswordResetDTO passwordResetDTO){
+        try{
+            return new ResponseEntity<>(employeeService.resetPassword(phone, passwordResetDTO), HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't reset password", e);
+        }
+    }
+
 }

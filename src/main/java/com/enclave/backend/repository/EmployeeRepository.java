@@ -25,4 +25,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Short> {
     @Query(value = "  SELECT branch.name,count(*) FROM Employee JOIN branch ON employee.branch_id = branch.id group by branch.name;\n", nativeQuery = true)
     List<Object[]> getCountOfEmployeeEachBranch();
 
+    Optional<Employee> findByPhone(String phone);
 }
