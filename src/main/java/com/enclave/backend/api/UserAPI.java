@@ -7,7 +7,8 @@ import com.enclave.backend.jwt.LoginRequest;
 import com.enclave.backend.jwt.LoginResponse;
 import com.enclave.backend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,7 +36,7 @@ public class UserAPI {
     }
 
     @PostMapping("/login")
-    public LoginResponse authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity <LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         // Xác thực từ username và password.
         String jwt = "";
         try {
@@ -48,8 +49,8 @@ public class UserAPI {
             // Trả về jwt cho người dùng.
             jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
         } catch (Exception e) {
-            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("Invalid token").body(null);
         }
-        return new LoginResponse(jwt);
+        return ResponseEntity.ok(new LoginResponse(jwt));
     }
 }

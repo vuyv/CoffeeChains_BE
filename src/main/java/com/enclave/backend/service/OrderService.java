@@ -1,20 +1,15 @@
 package com.enclave.backend.service;
 
 import com.enclave.backend.dto.OrderDTO;
-import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Order;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface OrderService {
 
     ResponseEntity<Order> createNewOrder(OrderDTO orderDTO);
-
 
     Order findOrderById(String id);
 
@@ -37,7 +32,7 @@ public interface OrderService {
     List<Order> findOrdersInAMonthInBranch();
 
     //manager
-    int getCountOfBranchOrderByDate (String date);
+    int getCountOfBranchOrderByDate(String date);
 
     double getCountOfBranchTotalPriceByDate(String date);
 

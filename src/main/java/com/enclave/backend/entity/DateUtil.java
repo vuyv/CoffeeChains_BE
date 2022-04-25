@@ -66,4 +66,26 @@ public class DateUtil {
     public String toString(final LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
     }
+
+    //note that week starts with Monday
+    public LocalDateTime startOfWeek(Date date) {
+        LocalDate localDate = LocalDate.from(toLocalDate(date));
+        return LocalDateTime.of(localDate,LocalTime.MIN ).with(LocalTime.MIN).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    //note that week ends with Sunday
+    public LocalDateTime endOfWeek(Date date) {
+        LocalDate localDate = LocalDate.from(toLocalDate(date));
+        return LocalDateTime.of(localDate,LocalTime.MAX).with(LocalTime.MAX).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public LocalDateTime startOfMonth(Date date) {
+        LocalDate localDate = LocalDate.from(toLocalDate(date));
+        return LocalDateTime.of(localDate,LocalTime.MIN ).with(LocalTime.MIN).with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    public LocalDateTime endOfMonth(Date date) {
+        LocalDate localDate = LocalDate.from(toLocalDate(date));
+        return LocalDateTime.of(localDate,LocalTime.MAX).with(LocalTime.MAX).with(TemporalAdjusters.lastDayOfMonth());
+    }
 }
