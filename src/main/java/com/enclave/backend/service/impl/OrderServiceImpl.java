@@ -358,15 +358,4 @@ public class OrderServiceImpl implements OrderService {
         }
         return queryResult;
     }
-
-    @Override
-    public List<Object[]> getDailyRevenueAllBranch() {
-        List<Object[]> queryResult = new ArrayList<Object[]>();
-        try {
-            queryResult = orderRepository.getDailyRevenueAllBranch();
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        return queryResult;
-    }
 }

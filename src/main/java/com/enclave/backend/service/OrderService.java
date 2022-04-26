@@ -2,6 +2,7 @@ package com.enclave.backend.service;
 
 import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.entity.Order;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -58,8 +59,5 @@ public interface OrderService {
     double getCurrentWeekRevenue();
 
     List<Object[]> getBestSellingProducts();
-
-    //Report
-    List<Object[]> getDailyRevenueAllBranch();
 
 }

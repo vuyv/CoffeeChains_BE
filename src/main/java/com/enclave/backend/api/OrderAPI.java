@@ -133,10 +133,4 @@ public class OrderAPI {
     public double getCurrentWeekRevenue() {
         return orderService.getCurrentWeekRevenue();
     }
-
-    //Report
-    @GetMapping("/owner/report/revenue/daily/allBranch")
-    public List<Object[]> getDailyRevenueAllBranch() {
-        return orderService.getDailyRevenueAllBranch();
-    }
 }
