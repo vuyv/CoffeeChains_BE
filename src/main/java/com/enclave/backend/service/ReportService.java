@@ -1,5 +1,7 @@
 package com.enclave.backend.service;
 
+import io.lettuce.core.dynamic.annotation.Param;
+
 import java.util.List;
 
 public interface ReportService {
@@ -15,4 +17,15 @@ public interface ReportService {
     List<Object[]> getBestSellingByCategory(short branchId, short categoryId, String date, String type);
 
     List<Object[]> getBestSellingByCategoryDaily(short branchId, short categoryId, String date);
+
+
+    //OWNER REPORT
+    //revenue
+    List<Object[]> getRevenueAllBranchByTime(String date, String type);
+
+    //allCategory
+    List<Object[]> getProductAllCategoryByTime(String date, String type);
+
+    //eachCategory
+    List<Object[]> getProductEachCategoryByTime(short categoryId, String date, String type);
 }

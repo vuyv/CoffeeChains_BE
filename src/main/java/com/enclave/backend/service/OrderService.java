@@ -60,33 +60,4 @@ public interface OrderService {
 
     List<Object[]> getBestSellingProducts();
 
-    //REPORT
-    //revenue
-    List<Object[]> getDailyRevenueAllBranch();
-
-    List<Object[]> getWeeklyRevenueAllBranch();
-
-    List<Object[]> getMonthlyRevenueAllBranch();
-
-    //product
-    List<Object[]> getDailyProductAllCategory();
-
-    List<Object[]> getWeeklyProductAllCategory();
-
-    List<Object[]> getMonthlyProductAllCategory();
-
-    List<Object[]> getDailyProductByCategory(short categoryId);
-
-    List<Object[]> getWeeklyProductByCategory(short categoryId);
-
-    List<Object[]> getMonthlyProductByCategory(short categoryId);
-
-
-
-    List<Object[]> getCustomDailyRevenueAllBranch(String date);
-
-    List<Object[]> getCustomWeeklyRevenueAllBranch(String date);
-
-    List<Object[]> getCustomMonthlyRevenueAllBranch(String date);
-
 }
