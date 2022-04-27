@@ -1,7 +1,7 @@
 package com.enclave.backend.service.impl;
 
-import com.enclave.backend.repository.RevenueReportRepository;
-import com.enclave.backend.service.RevenueReportService;
+import com.enclave.backend.repository.EmployeeReportRepository;
+import com.enclave.backend.service.EmployeeReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +12,14 @@ import java.util.List;
 import static com.enclave.backend.entity.DateUtil.*;
 
 @Service
-public class RevenueReportServiceImpl implements RevenueReportService {
+public class EmployeeReportServiceImpl implements EmployeeReportService {
 
     @Autowired
-    RevenueReportRepository revenueReportRepository;
+    private EmployeeReportRepository employeeReportRepository;
 
-    //OWNER
     @Override
-    public List<Object[]> getAllBranch(String date, String type) {
-        List<Object[]> queryResult = new ArrayList<Object[]>();
+    public List<Object[]> getEachBranch(short branchId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
         Date selectedDate = StringtoDate(date);
         try {
             String startDate = "";
@@ -37,7 +36,7 @@ public class RevenueReportServiceImpl implements RevenueReportService {
                 startDate = startOfMonth(selectedDate).toString();
                 endDate = endOfMonth((selectedDate)).toString();
             }
-            queryResult = revenueReportRepository.getAllBranch(startDate, endDate);
+            queryResult = employeeReportRepository.getEachBranch(branchId, startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
         }
