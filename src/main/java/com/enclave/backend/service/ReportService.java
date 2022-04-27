@@ -19,13 +19,4 @@ public interface ReportService {
     List<Object[]> getBestSellingByCategoryDaily(short branchId, short categoryId, String date);
 
 
-    //OWNER REPORT
-    //revenue
-    List<Object[]> getRevenueAllBranchByTime(String date, String type);
-
-    //allCategory
-    List<Object[]> getProductAllCategoryByTime(String date, String type);
-
-    //eachCategory
-    List<Object[]> getProductEachCategoryByTime(short categoryId, String date, String type);
 }
