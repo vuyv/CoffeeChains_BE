@@ -10,21 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Order, String> {
-
-    //OWNER
-    //Revenue
-    @Query(value = "SELECT branch.name, branch.address, count(*) AS orderQuantity, sum(orders.total_price) as revenue FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND orders.created_at BETWEEN :startDate AND :endDate group by branch.name;\n", nativeQuery = true)
-    List<Object[]> getRevenueAllBranchByTime(@Param("startDate")String startDate, @Param("endDate")String endDate );
-
-
-    //AllProduct
-    @Query(value = "select category.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from orders JOIN order_detail ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id WHERE orders.created_at BETWEEN :startDate AND :endDate group by category.name;", nativeQuery = true)
-    List<Object[]> getProductAllCategoryByTime(@Param("startDate")String startDate, @Param("endDate")String endDate);
-
-    //ProductEachCategory
-    @Query(value = "select product.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from orders JOIN order_detail ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id WHERE orders.created_at BETWEEN :startDate AND :endDate AND category.id = :categoryId group by product.name;", nativeQuery = true)
-    List<Object[]> getProductEachCategoryByTime(@Param("categoryId") short categoryId, @Param("startDate")String startDate, @Param("endDate")String endDate );
-
     //MANAGER
     @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY, sum(QUANTITY * product.price) as revenue FROM order_detail " +
             "JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id " +
