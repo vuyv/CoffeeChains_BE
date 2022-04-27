@@ -21,22 +21,27 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportRepository reportRepository;
 
+    // Manager
     @Override
-    public List<Object[]> getTopSeller(short branchId, String date, String type) {
-        DateUtil dateUtil = new DateUtil();
-        List<Object[]> queryResult = new ArrayList<Object[]>();
+    public List<Object[]> getProductsAllCategoryEachBranch(short branchId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
+        Date selectedDate = StringtoDate(date);
         try {
-            Date selectedDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-            if(type.equals("weekly")){
-                LocalDateTime startOfWeek = dateUtil.startOfWeek(selectedDate);
-                LocalDateTime endOfWeek = endOfWeek((selectedDate));
-                queryResult = reportRepository.getTopSeller(branchId, startOfWeek.toString(), endOfWeek.toString());
+            String startDate = "";
+            String endDate = "";
+            if(type.equals("Daily")){
+                startDate = startOfDay(selectedDate).toString();
+                endDate = endOfDay((selectedDate)).toString();
             }
-            if(type.equals("monthly")){
-                LocalDateTime startOfMonth = dateUtil.startOfMonth(selectedDate);
-                LocalDateTime endOfMonth = dateUtil.endOfMonth((selectedDate));
-                queryResult = reportRepository.getTopSeller(branchId, startOfMonth.toString(), endOfMonth.toString());
+            if(type.equals("Weekly")){
+                startDate = startOfWeek(selectedDate).toString();
+                endDate = endOfWeek((selectedDate)).toString();
             }
+            if(type.equals("Monthly")){
+                startDate = startOfMonth(selectedDate).toString();
+                endDate = endOfMonth((selectedDate)).toString();
+            }
+            queryResult = reportRepository.getProductsAllCategoryEachBranch(branchId, startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
         }
@@ -44,10 +49,25 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Object[]> getTopSellerDaily(short branchId, String date) {
-        List<Object[]> queryResult = new ArrayList<Object[]>();
+    public List<Object[]> getProductsByCategoryEachBranch(short branchId, short categoryId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
+        Date selectedDate = StringtoDate(date);
         try {
-            queryResult = reportRepository.getTopSellerDaily(branchId, date);
+            String startDate = "";
+            String endDate = "";
+            if(type.equals("Daily")){
+                startDate = startOfDay(selectedDate).toString();
+                endDate = endOfDay((selectedDate)).toString();
+            }
+            if(type.equals("Weekly")){
+                startDate = startOfWeek(selectedDate).toString();
+                endDate = endOfWeek((selectedDate)).toString();
+            }
+            if(type.equals("Monthly")){
+                startDate = startOfMonth(selectedDate).toString();
+                endDate = endOfMonth((selectedDate)).toString();
+            }
+            queryResult = reportRepository.getProductsByCategoryEachBranch(branchId, categoryId, startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
         }
@@ -55,71 +75,28 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Object[]> getBestSellingAllCategory(short branchId, String date, String type) {
-        DateUtil dateUtil = new DateUtil();
-        List<Object[]> queryResult = new ArrayList<Object[]>();
+    public List<Object[]> getEmployeesEachBranch(short branchId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
+        Date selectedDate = StringtoDate(date);
         try {
-            Date selectedDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-            if(type.equals("weekly")){
-                LocalDateTime startOfWeek = dateUtil.startOfWeek(selectedDate);
-                LocalDateTime endOfWeek = endOfWeek((selectedDate));
-                queryResult = reportRepository.getBestSellingAllCategory(branchId, startOfWeek.toString(), endOfWeek.toString());
+            String startDate = "";
+            String endDate = "";
+            if(type.equals("Daily")){
+                startDate = startOfDay(selectedDate).toString();
+                endDate = endOfDay((selectedDate)).toString();
             }
-            if(type.equals("monthly")){
-                LocalDateTime startOfMonth = dateUtil.startOfMonth(selectedDate);
-                LocalDateTime endOfMonth = dateUtil.endOfMonth((selectedDate));
-                queryResult = reportRepository.getBestSellingAllCategory(branchId, startOfMonth.toString(), endOfMonth.toString());
+            if(type.equals("Weekly")){
+                startDate = startOfWeek(selectedDate).toString();
+                endDate = endOfWeek((selectedDate)).toString();
             }
+            if(type.equals("Monthly")){
+                startDate = startOfMonth(selectedDate).toString();
+                endDate = endOfMonth((selectedDate)).toString();
+            }
+            queryResult = reportRepository.getEmployeesEachBranch(branchId, startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
         }
         return queryResult;
     }
-
-    @Override
-    public List<Object[]> getBestSellingAllCategoryDaily(short branchId, String date) {
-        List<Object[]> queryResult = new ArrayList<Object[]>();
-        try {
-            queryResult = reportRepository.getBestSellingAllCategoryDaily(branchId, date);
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        return queryResult;
-    }
-
-    @Override
-    public List<Object[]> getBestSellingByCategory(short branchId,short categoryId, String date, String type) {
-        DateUtil dateUtil = new DateUtil();
-        List<Object[]> queryResult = new ArrayList<Object[]>();
-        try {
-            Date selectedDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-            if(type.equals("weekly")){
-                LocalDateTime startOfWeek = dateUtil.startOfWeek(selectedDate);
-                LocalDateTime endOfWeek = endOfWeek((selectedDate));
-                queryResult = reportRepository.getBestSellingByCategory(branchId, categoryId, startOfWeek.toString(), endOfWeek.toString());
-            }
-            if(type.equals("monthly")){
-                LocalDateTime startOfMonth = dateUtil.startOfMonth(selectedDate);
-                LocalDateTime endOfMonth = dateUtil.endOfMonth((selectedDate));
-                queryResult = reportRepository.getBestSellingByCategory(branchId, categoryId, startOfMonth.toString(), endOfMonth.toString());
-            }
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        return queryResult;
-    }
-
-    @Override
-    public List<Object[]> getBestSellingByCategoryDaily(short branchId,short categoryId, String date) {
-        List<Object[]> queryResult = new ArrayList<Object[]>();
-        try {
-            queryResult = reportRepository.getBestSellingByCategoryDaily(branchId, categoryId, date);
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        return queryResult;
-    }
-
-
-
 }
