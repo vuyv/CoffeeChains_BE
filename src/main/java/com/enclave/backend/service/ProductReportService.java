@@ -8,4 +8,11 @@ public interface ProductReportService {
     List<Object[]> getAllCategory(String date, String type);
 
     List<Object[]> getEachCategory(short categoryId, String date, String type);
+
+    List<Object[]> getByTypeEachBranch(short branchId, short categoryId, String date, String type);
+
+    List<Object[]> getAllCategoryEachBranch(short branchId, String date, String type);
+
+    List<Object[]> getByCategoryEachBranch(short branchId, short categoryId, String date, String type);
+
 }

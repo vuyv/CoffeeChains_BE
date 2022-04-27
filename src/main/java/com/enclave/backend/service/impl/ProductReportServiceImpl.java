@@ -76,4 +76,65 @@ public class ProductReportServiceImpl implements ProductReportService {
         }
         return queryResult;
     }
+
+    // EachBranch
+    @Override
+    public List<Object[]> getByTypeEachBranch(short branchId, short categoryId, String date, String type) {
+        if (categoryId == 0){
+            return getAllCategoryEachBranch(branchId, date, type);
+        }
+        return getByCategoryEachBranch(branchId, categoryId, date, type);
+    }
+
+    @Override
+    public List<Object[]> getAllCategoryEachBranch(short branchId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
+        Date selectedDate = StringtoDate(date);
+        try {
+            String startDate = "";
+            String endDate = "";
+            if(type.equals("Daily")){
+                startDate = startOfDay(selectedDate).toString();
+                endDate = endOfDay((selectedDate)).toString();
+            }
+            if(type.equals("Weekly")){
+                startDate = startOfWeek(selectedDate).toString();
+                endDate = endOfWeek((selectedDate)).toString();
+            }
+            if(type.equals("Monthly")){
+                startDate = startOfMonth(selectedDate).toString();
+                endDate = endOfMonth((selectedDate)).toString();
+            }
+            queryResult = productReportRepository.getProductsAllCategoryEachBranch(branchId, startDate, endDate);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getByCategoryEachBranch(short branchId, short categoryId, String date, String type) {
+        List<Object[]> queryResult = new ArrayList<>();
+        Date selectedDate = StringtoDate(date);
+        try {
+            String startDate = "";
+            String endDate = "";
+            if(type.equals("Daily")){
+                startDate = startOfDay(selectedDate).toString();
+                endDate = endOfDay((selectedDate)).toString();
+            }
+            if(type.equals("Weekly")){
+                startDate = startOfWeek(selectedDate).toString();
+                endDate = endOfWeek((selectedDate)).toString();
+            }
+            if(type.equals("Monthly")){
+                startDate = startOfMonth(selectedDate).toString();
+                endDate = endOfMonth((selectedDate)).toString();
+            }
+            queryResult = productReportRepository.getProductsByCategoryEachBranch(branchId, categoryId, startDate, endDate);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return queryResult;
+    }
 }
