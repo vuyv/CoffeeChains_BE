@@ -23,6 +23,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.enclave.backend.entity.DateUtil.*;
+
 @AllArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -221,17 +223,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //manager
+    //Chart: weekly revenue
     @Override
-    public List<Object[]> getCountOfTotalPriceInBranchWeekly() {
-        Calendar calendar = Calendar.getInstance();
+    public List<Object[]> getCountOfTotalPriceInBranchWeekly(String date) {
+//        Calendar calendar = Calendar.getInstance();
+//
+//        calendar.add(Calendar.DAY_OF_MONTH, -8);
+//        Date sevenDaysBefore = calendar.getTime();
 
-        calendar.add(Calendar.DAY_OF_MONTH, -8);
-        Date sevenDaysBefore = calendar.getTime();
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfWeek(selectedDate).toString();
+        String endDate = endOfWeek((selectedDate)).toString();
+        System.out.println(startDate + " " + endDate);
 
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
 
-        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, sevenDaysBefore);
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, startDate,endDate );
 
 
         return queryResult;

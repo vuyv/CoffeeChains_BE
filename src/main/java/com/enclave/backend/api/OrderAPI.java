@@ -78,9 +78,9 @@ public class OrderAPI {
         return orderService.getCountOfBranchTotalPriceByDate(date);
     }
 
-    @GetMapping("/branch/count/lastweek")
-    public List<Object[]> getCountOfTotalPriceInBranchWeekly() {
-        return orderService.getCountOfTotalPriceInBranchWeekly();
+    @GetMapping("/branch/count/lastweek/{date}")
+    public List<Object[]> getCountOfTotalPriceInBranchWeekly(@PathVariable("date") String date) {
+        return orderService.getCountOfTotalPriceInBranchWeekly(date);
     }
 
     @GetMapping("/manager/bestSellingProducts")

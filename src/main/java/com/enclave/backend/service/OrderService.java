@@ -37,7 +37,7 @@ public interface OrderService {
 
     double getCountOfBranchTotalPriceByDate(String date);
 
-    List<Object[]> getCountOfTotalPriceInBranchWeekly();
+    List<Object[]> getCountOfTotalPriceInBranchWeekly(String date);
 
     //owner
     double getCountOfAllTotalPriceByDate(String date);
