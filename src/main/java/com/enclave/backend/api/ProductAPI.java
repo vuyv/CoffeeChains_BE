@@ -1,7 +1,6 @@
 package com.enclave.backend.api;
 
 import com.enclave.backend.dto.ProductDTO;
-import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Product;
 import com.enclave.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +48,15 @@ public class ProductAPI {
     @GetMapping("/countAll")
     public Long countAllProduct(){
         return productService.countAllProduct();
+    }
+
+    @GetMapping("/")
+    public List<Product> findByCategoryAndStatus(@RequestParam("categoryId") short categoryId, @RequestParam("status") String status){
+        return productService.findByCategoryAndStatus(categoryId, status);
+    }
+
+    @GetMapping("/status")
+    public List<Product> findByStatus(@RequestParam("status") String status){
+        return productService.findByStatus(status);
     }
 }

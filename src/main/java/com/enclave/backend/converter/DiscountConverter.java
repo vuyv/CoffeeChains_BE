@@ -13,7 +13,6 @@ public class DiscountConverter {
         entity.setTitle(dto.getTitle());
         entity.setStartedAt(dto.getStartedAt());
         entity.setEndedAt(dto.getEndedAt());
-        entity.setStatus(Discount.Status.UPCOMING);
         return entity;
     }
 }
