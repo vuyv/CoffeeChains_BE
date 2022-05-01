@@ -5,13 +5,16 @@ import com.enclave.backend.dto.DiscountDTO;
 import com.enclave.backend.entity.Discount;
 import com.enclave.backend.repository.DiscountRepository;
 import com.enclave.backend.service.DiscountService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -19,15 +22,18 @@ public class DiscountServiceImpl implements DiscountService {
     @Autowired
     private DiscountRepository discountRepository;
 
+
     @Autowired
     private DiscountConverter discountConverter;
 
     @Override
-    public Discount createDiscount(DiscountDTO discountDTO) {
+    public ResponseEntity<Discount> createDiscount(DiscountDTO discountDTO) {
         Discount discount = discountConverter.toEntity(discountDTO);
-//        String generatedString = RandomStringUtils.randomAlphabetic(6);
-//        discount.setCode(generatedString);
-        return discountRepository.save(discount);
+        if (discount.isUpcoming()) {
+            return ok(discountRepository.save(discount));
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @Override
@@ -42,20 +48,10 @@ public class DiscountServiceImpl implements DiscountService {
         return discountRepository.save(oldDiscount);
     }
 
-    private boolean isHappeningDiscount(Discount discount, Date currentDate) {
-        Date startedAt = discount.getStartedAt();
-        Date endedAt = discount.getEndedAt();
-
-        if (startedAt.equals(currentDate) || endedAt.equals(currentDate)) {
-            return true;
-        }
-        return startedAt.before(currentDate) && endedAt.after(currentDate);
-    }
-
     @Override
     public boolean isValidDiscount(String code, Date currentDate) {
         Discount discount = discountRepository.findById(code).orElseThrow(() -> new IllegalArgumentException("Invalid discount code: " + code));
-        return isHappeningDiscount(discount, currentDate);
+        return discount.isHappening();
     }
 
     @Override
@@ -74,18 +70,58 @@ public class DiscountServiceImpl implements DiscountService {
         return discount.getStartedAt().compareTo(currentDate) * currentDate.compareTo(discount.getEndedAt()) >= 0 ? discount : null;
     }
 
+//    private boolean isHappeningDiscount(Discount discount, Date currentDate) {
+//        Date startedAt = discount.getStartedAt();
+//        Date endedAt = discount.getEndedAt();
+//
+//        if (startedAt.equals(currentDate) || endedAt.equals(currentDate)) {
+//            return true;
+//        }
+//        return startedAt.before(currentDate) && endedAt.after(currentDate);
+//    }
+
     @Override
-    public List<Discount> getDiscountsByStatus(String status) {
-        Discount.Status statusEnum = Discount.Status.valueOf(status.toUpperCase(Locale.ROOT));
-        List<Discount> discounts = discountRepository.getDiscountsByStatus(statusEnum);
-        return discounts;
+    public List<Discount> getHappeningDiscounts() {
+        List<Discount> discounts = discountRepository.findAll();
+        List<Discount> happeningDiscounts = new ArrayList<>();
+        discounts.forEach(discount -> {
+            if (discount.getStatus().equals(Discount.Status.HAPPENING)) {
+                happeningDiscounts.add(discount);
+            }
+        });
+        return happeningDiscounts;
+    }
+
+
+    @Override
+    public List<Discount> getUpcomingDiscounts() {
+        List<Discount> discounts = discountRepository.findAll();
+        List<Discount> upcomingDiscounts = new ArrayList<>();
+        discounts.forEach(discount -> {
+            if (discount.getStatus().equals(Discount.Status.UPCOMING)) {
+                upcomingDiscounts.add(discount);
+            }
+        });
+        return upcomingDiscounts;
+    }
+
+    @Override
+    public List<Discount> getExpiredDiscounts() {
+        List<Discount> discounts = discountRepository.findAll();
+        List<Discount> expiredDiscounts = new ArrayList<>();
+        discounts.forEach(discount -> {
+            if (discount.getStatus().equals(Discount.Status.EXPIRED)) {
+                expiredDiscounts.add(discount);
+            }
+        });
+        return expiredDiscounts;
     }
 
     @Override
     public void deleteDiscount(String code) {
         try {
             discountRepository.deleteById(code);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }

@@ -20,4 +20,9 @@ public interface ProductService {
     Product disableProduct(short id);
 
     Long countAllProduct();
+
+    List<Product> findByCategoryAndStatus(short categoryId, String status);
+
+    List<Product> findByStatus(String status);
+
 }

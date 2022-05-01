@@ -1,6 +1,5 @@
 package com.enclave.backend.dto;
 
-import com.enclave.backend.entity.Discount;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,5 +12,5 @@ public class DiscountDTO {
     Date startedAt;
     Date endedAt;
     String discountCode;
-    Discount.Status status;
+//    Discount.Status status;
 }

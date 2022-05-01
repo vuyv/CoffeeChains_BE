@@ -4,7 +4,6 @@ import com.enclave.backend.dto.DiscountDTO;
 import com.enclave.backend.entity.Discount;
 import com.enclave.backend.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +18,7 @@ public class DiscountAPI {
     private DiscountService discountService;
 
     @PostMapping("/new")
-    public Discount createDiscount(@RequestBody DiscountDTO dto) {
+    public ResponseEntity<Discount> createDiscount(@RequestBody DiscountDTO dto) {
         return discountService.createDiscount(dto);
     }
 
@@ -46,8 +45,14 @@ public class DiscountAPI {
     }
 
     @GetMapping("/status/{status}")
-    public List<Discount> getDiscounstByStatus(@PathVariable("status") String status) {
-        return discountService.getDiscountsByStatus(status);
+    public List<Discount> getDiscountsByStatus(@PathVariable(name="status") String status) {
+        if (status.equals("expired")){
+            return discountService.getExpiredDiscounts();
+        }
+        if (status.equals("happening")){
+            return discountService.getHappeningDiscounts();
+        }
+        return discountService.getUpcomingDiscounts();
     }
 
     @DeleteMapping("/{code}")

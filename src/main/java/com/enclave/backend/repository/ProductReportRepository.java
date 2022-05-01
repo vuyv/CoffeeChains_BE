@@ -18,10 +18,13 @@ public interface ProductReportRepository extends JpaRepository<Order, String> {
 
     //EachBranch
     //allCategory
-    @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY, sum(QUANTITY * product.price) as revenue FROM order_detail\n" +
-            "JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id\n" +
-            "JOIN employee on orders.created_by = employee.id join category on product.category_id = category.id \n" +
-            "where employee.branch_id = :branchId AND orders.created_at BETWEEN :startDate AND :endDate group by product.name", nativeQuery = true)
+//    @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY, sum(QUANTITY * product.price) as revenue FROM order_detail\n" +
+//            "JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id\n" +
+//            "JOIN employee on orders.created_by = employee.id join category on product.category_id = category.id \n" +
+//            "where employee.branch_id = :branchId AND orders.created_at BETWEEN :startDate AND :endDate group by product.name", nativeQuery = true)
+    @Query(value = "select category.name, sum(order_detail.quantity), sum(order_detail.quantity*product.price) from orders JOIN order_detail ON orders.id = order_detail.order_id " +
+            "JOIN product ON order_detail.product_id = product.id JOIN category ON product.category_id = category.id join employee on employee.branch_id = orders.created_by " +
+            "WHERE employee.branch_id = :branchId and orders.created_at BETWEEN :startDate AND :endDate group by category.name",nativeQuery = true)
     List<Object[]> getProductsAllCategoryEachBranch(@Param("branchId") short branchId, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
     //eachCategory

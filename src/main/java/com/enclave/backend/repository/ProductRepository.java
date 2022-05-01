@@ -17,4 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Short> {
     @Query("SELECT p FROM Product p WHERE p.category.id= :categoryId")
     List<Product> findByCategory(@Param("category") short categoryId);
 
+    @Query("SELECT p FROM Product p WHERE p.category.id= :categoryId and p.status = :status")
+    List<Product> findByCategoryAndStatus(@Param("category") short categoryId, @Param("status") Product.Status status);
+
+    @Query("SELECT p FROM Product p WHERE  p.status = :status")
+    List<Product> findByStatus(@Param("status") Product.Status status);
+
 }

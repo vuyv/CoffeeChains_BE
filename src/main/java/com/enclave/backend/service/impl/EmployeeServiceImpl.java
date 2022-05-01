@@ -23,7 +23,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,7 +118,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         newEmployee.setBranch(branch);
         newEmployee.setPassword(passwordEncode.encode("123123"));
         newEmployee.setStatus(Employee.Status.ACTIVE);
-        employeeRepository.save(newEmployee);
+//        employeeRepository.save(newEmployee);
         return employeeRepository.save(newEmployee);
     }
 

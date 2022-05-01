@@ -3,7 +3,6 @@ package com.enclave.backend.service.impl;
 import com.enclave.backend.converter.ProductConverter;
 import com.enclave.backend.dto.ProductDTO;
 import com.enclave.backend.entity.Category;
-import com.enclave.backend.entity.Employee;
 import com.enclave.backend.entity.Product;
 import com.enclave.backend.repository.CategoryRepository;
 import com.enclave.backend.repository.ProductRepository;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -80,4 +80,17 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.count();
     }
 
+    @Override
+    public List<Product> findByCategoryAndStatus(short categoryId, String status){
+        Product.Status statusEnum = Product.Status.valueOf(status.toUpperCase(Locale.ROOT));
+        List<Product> products = productRepository.findByCategoryAndStatus(categoryId, statusEnum);
+        return products;
+    }
+
+    @Override
+    public List<Product> findByStatus(String status){
+        Product.Status statusEnum = Product.Status.valueOf(status.toUpperCase(Locale.ROOT));
+        List<Product> products = productRepository.findByStatus(statusEnum);
+        return products;
+    }
 }
