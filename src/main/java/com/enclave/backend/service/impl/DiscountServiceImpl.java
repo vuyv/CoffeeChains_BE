@@ -7,14 +7,13 @@ import com.enclave.backend.repository.DiscountRepository;
 import com.enclave.backend.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.springframework.http.ResponseEntity.ok;
+import java.util.Optional;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -26,14 +25,23 @@ public class DiscountServiceImpl implements DiscountService {
     @Autowired
     private DiscountConverter discountConverter;
 
+    public boolean isExistDiscount(String discountCode){
+        Optional<Discount> existDiscount = discountRepository.findById(discountCode);
+        return existDiscount.isPresent();
+    }
+
+
     @Override
-    public ResponseEntity<Discount> createDiscount(DiscountDTO discountDTO) {
+    public Discount createDiscount(DiscountDTO discountDTO) {
+        if (isExistDiscount(discountDTO.getCode())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         Discount discount = discountConverter.toEntity(discountDTO);
-        if (discount.isUpcoming()) {
-            return ok(discountRepository.save(discount));
+        if (!discount.isUpcoming()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return discountRepository.save(discount);
     }
 
     @Override

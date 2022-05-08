@@ -11,6 +11,6 @@ public class DiscountDTO {
     double percent;
     Date startedAt;
     Date endedAt;
-    String discountCode;
+//    String discountCode;
 //    Discount.Status status;
 }

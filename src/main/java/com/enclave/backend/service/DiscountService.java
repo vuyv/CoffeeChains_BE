@@ -2,13 +2,12 @@ package com.enclave.backend.service;
 
 import com.enclave.backend.dto.DiscountDTO;
 import com.enclave.backend.entity.Discount;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
 import java.util.List;
 
 public interface DiscountService {
-    ResponseEntity<Discount> createDiscount(DiscountDTO dto);
+    Discount createDiscount(DiscountDTO dto);
 
     Discount updateDiscount(Discount discount);
 

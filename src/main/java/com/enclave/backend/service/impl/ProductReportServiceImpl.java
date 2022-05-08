@@ -44,6 +44,10 @@ public class ProductReportServiceImpl implements ProductReportService {
                 startDate = startOfMonth(selectedDate).toString();
                 endDate = endOfMonth((selectedDate)).toString();
             }
+            if(type.equals("Quarterly")){
+                startDate = startOfQuarter(selectedDate).toString();
+                endDate = endOfQuarter((selectedDate)).toString();
+            }
             queryResult = productReportRepository.getAllCategory(startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
@@ -69,6 +73,10 @@ public class ProductReportServiceImpl implements ProductReportService {
             if(type.equals("Monthly")){
                 startDate = startOfMonth(selectedDate).toString();
                 endDate = endOfMonth((selectedDate)).toString();
+            }
+            if(type.equals("Quarter")){
+                startDate = startOfQuarter(selectedDate).toString();
+                endDate = endOfQuarter((selectedDate)).toString();
             }
             queryResult = productReportRepository.getEachCategory(categoryId, startDate, endDate);
         } catch (Exception e){
