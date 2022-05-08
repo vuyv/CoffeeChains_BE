@@ -5,6 +5,7 @@ import com.enclave.backend.jwt.CustomUserDetails;
 import com.enclave.backend.jwt.JwtTokenProvider;
 import com.enclave.backend.jwt.LoginRequest;
 import com.enclave.backend.jwt.LoginResponse;
+import com.enclave.backend.repository.EmployeeRepository;
 import com.enclave.backend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -26,6 +28,9 @@ public class UserAPI {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Autowired
     private JwtTokenProvider tokenProvider;
@@ -42,12 +47,16 @@ public class UserAPI {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            // Nếu không xảy ra exception tức là thông tin hợp lệ
-            // Set thông tin authentication vào Security Context
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Optional<Employee> employee = Optional.ofNullable(employeeRepository.findByUsername(loginRequest.getUsername()));
+            if(employee.get().getStatus().equals(Employee.Status.ACTIVE)) {
+                // Nếu không xảy ra exception tức là thông tin hợp lệ
+                // Set thông tin authentication vào Security Context
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Trả về jwt cho người dùng.
-            jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
+                // Trả về jwt cho người dùng.
+                jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
+            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("Invalid token").body(null);
         }

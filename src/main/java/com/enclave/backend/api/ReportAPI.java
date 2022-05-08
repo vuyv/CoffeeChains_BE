@@ -3,9 +3,20 @@ package com.enclave.backend.api;
 import com.enclave.backend.service.EmployeeReportService;
 import com.enclave.backend.service.ProductReportService;
 import com.enclave.backend.service.RevenueReportService;
+import com.enclave.backend.service.report.ExportType;
+import com.enclave.backend.service.report.ReportService;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.awt.print.PrinterException;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -20,6 +31,9 @@ public class ReportAPI {
 
     @Autowired
     private EmployeeReportService employeeReportService;
+
+    @Autowired
+    private ReportService reportService;
 
     //OWNER
     @GetMapping("/owner")
@@ -37,5 +51,12 @@ public class ReportAPI {
             return productReportService.getByTypeEachBranch(branchId,categoryId, date, timeRange);
         }
         return employeeReportService.getEachBranch(branchId,date, timeRange);
+    }
+
+    @GetMapping(value = "/manager/export")
+    ResponseEntity<Void> generateReport(@RequestParam(value = "exportType") ExportType exportType, HttpServletResponse response, @RequestParam("branchId") short branchId, @RequestParam("date") String date,
+                                                   @RequestParam("timeRange")String timeRange, @RequestParam("type") String type, @RequestParam("categoryId") short categoryId) throws JRException, IOException, ParseException, PrinterException {
+        reportService.downloadReport( exportType,  response,type, branchId,  date,  timeRange, categoryId);
+        return ResponseEntity.ok().build();
     }
 }

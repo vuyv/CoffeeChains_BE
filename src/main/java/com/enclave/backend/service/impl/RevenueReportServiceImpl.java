@@ -37,6 +37,10 @@ public class RevenueReportServiceImpl implements RevenueReportService {
                 startDate = startOfMonth(selectedDate).toString();
                 endDate = endOfMonth((selectedDate)).toString();
             }
+            if(type.equals("Quarterly")){
+                startDate = startOfQuarter(selectedDate).toString();
+                endDate = endOfQuarter((selectedDate)).toString();
+            }
             queryResult = revenueReportRepository.getAllBranch(startDate, endDate);
         } catch (Exception e){
             System.out.println(e);
