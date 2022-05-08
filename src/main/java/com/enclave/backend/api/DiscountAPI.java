@@ -4,8 +4,10 @@ import com.enclave.backend.dto.DiscountDTO;
 import com.enclave.backend.entity.Discount;
 import com.enclave.backend.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -19,7 +21,11 @@ public class DiscountAPI {
 
     @PostMapping("/new")
     public ResponseEntity<Discount> createDiscount(@RequestBody DiscountDTO dto) {
-        return discountService.createDiscount(dto);
+        try{
+            return new ResponseEntity<>(discountService.createDiscount(dto), HttpStatus.OK) ;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Create fail.", e);
+        }
     }
 
     @PutMapping("/{code}")

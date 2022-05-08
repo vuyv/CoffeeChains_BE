@@ -133,4 +133,29 @@ public class OrderAPI {
     public double getCurrentWeekRevenue() {
         return orderService.getCurrentWeekRevenue();
     }
+
+    @GetMapping("/manager/revenue/currentWeek")
+    public double getWeeklyRevenueEachBranch() {
+        return orderService.getWeeklyRevenueEachBranch();
+    }
+
+    @GetMapping("/manager/revenue/currentMonth")
+    public double getCurrentMonthRevenueEachBranch() {
+        return orderService.getCurrentMonthRevenueEachBranch();
+    }
+
+    @GetMapping("/manager/compare/lastMonth")
+    public double compareLastMonthBranchRevenue(){
+        return orderService.compareLastMonthBranchRevenue();
+    }
+
+    @GetMapping("/manager/orderQuantity/monthly")
+    public List<Object[]> getOrderQuantityByStatus(){
+        return orderService.getOrderQuantityByStatus();
+    }
+
+    @GetMapping("/manager/topProducts/last3Months")
+    public List<Object[]> getTopProductsLast3Months(String date){
+        return orderService.getTopProducts(date);
+    }
 }

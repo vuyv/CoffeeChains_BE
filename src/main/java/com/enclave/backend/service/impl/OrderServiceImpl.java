@@ -206,19 +206,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> findOrdersInCurrentDayInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentDay(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentDay(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
         return orders;
     }
 
     @Override
     public List<Order> findOrdersInAWeekInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentWeek(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentWeek(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
         return orders;
     }
 
     @Override
     public List<Order> findOrdersInAMonthInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentMonth(dateUtil.toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
+        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentMonth(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
         return orders;
     }
 
@@ -226,15 +226,10 @@ public class OrderServiceImpl implements OrderService {
     //Chart: weekly revenue
     @Override
     public List<Object[]> getCountOfTotalPriceInBranchWeekly(String date) {
-//        Calendar calendar = Calendar.getInstance();
-//
-//        calendar.add(Calendar.DAY_OF_MONTH, -8);
-//        Date sevenDaysBefore = calendar.getTime();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfWeek(selectedDate).toString();
         String endDate = endOfWeek((selectedDate)).toString();
-        System.out.println(startDate + " " + endDate);
 
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
@@ -270,7 +265,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return count;
     }
-
 
     //owner
     @Override
@@ -365,5 +359,46 @@ public class OrderServiceImpl implements OrderService {
             System.out.println(e);
         }
         return queryResult;
+    }
+
+    @Override
+    public double getWeeklyRevenueEachBranch() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        return orderRepository.getWeeklyRevenueEachBranch(branchId);
+    }
+
+    @Override
+    public double getCurrentMonthRevenueEachBranch() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        return orderRepository.getCurrentMonthRevenueEachBranch(branchId);
+    }
+
+    @Override
+    public double compareLastMonthBranchRevenue() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        double lastMonthRevenue =  orderRepository.getLastMonthRevenueEachBranch(branchId);
+        double currentMonthRevenue = orderRepository.getCurrentMonthRevenueEachBranch(branchId);
+        double compare = currentMonthRevenue - lastMonthRevenue;
+        return compare;
+    }
+
+    @Override
+    public List<Object[]> getOrderQuantityByStatus() {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        return orderRepository.getMonthlyOrderQuantityBranchBothStatus(branchId);
+    }
+
+    @Override
+    public List<Object[]> getTopProducts(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfLast3Months(selectedDate).toString();
+        String endDate = endOfLast3Months(selectedDate).toString();
+        return orderRepository.getTopProducts(branchId, startDate, endDate);
     }
 }
