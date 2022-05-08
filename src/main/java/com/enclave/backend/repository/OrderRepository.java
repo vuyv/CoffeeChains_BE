@@ -2,6 +2,7 @@ package com.enclave.backend.repository;
 
 import com.enclave.backend.entity.Order;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -60,6 +61,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT branch.name,sum(orders.total_price) AS TOTAL FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id AND  week(orders.created_at)=week(now()) group by branch.name ORDER BY TOTAL DESC LIMIT 6", nativeQuery = true)
     List<Object[]> topWeeklySeller();
 
+    @Cacheable("bestSellingProducts")
     @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY FROM order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN employee on orders.created_by = employee.id JOIN branch on employee.branch_id = branch.id where employee.branch_id = :branchId AND week(orders.created_at)=week(now()) group by product.name order by QUANTITY desc LIMIT 10", nativeQuery = true)
     List<Object[]> getBestSellingProducts(@Param("branchId") short branchId);
 
