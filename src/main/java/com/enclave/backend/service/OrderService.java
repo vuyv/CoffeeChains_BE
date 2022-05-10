@@ -25,11 +25,12 @@ public interface OrderService {
 
     Order findOrderByIdInBranch(short branchId, String orderId);
 
-    List<Order> findOrdersInCurrentDayInBranch();
+    /////////////////
+    List<Order> getDailyOrdersInBranch(String date);
 
-    List<Order> findOrdersInAWeekInBranch();
+    List<Order> getWeeklyOrdersInBranch(String date);
 
-    List<Order> findOrdersInAMonthInBranch();
+    List<Order> getMonthlyOrdersInBranch(String date);
 
     //manager
     int getCountOfBranchOrderByDate(String date);

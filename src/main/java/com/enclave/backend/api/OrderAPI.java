@@ -52,20 +52,21 @@ public class OrderAPI {
         return orderService.findOrderByOrdinalNumber(ordinalNumber);
     }
 
-    @GetMapping("/branch/find/day")
-    List<Order> findOrdersInCurrentDayInBranch() {
-        return orderService.findOrdersInCurrentDayInBranch();
+
+    /////////////////////////////////////
+    @GetMapping("/branch/daily/{date}")
+    List<Order> getDailyOrdersInBranch(@PathVariable("date") String date) {
+        return orderService.getDailyOrdersInBranch(date);
+    }
+    @GetMapping("/branch/weekly/{date}")
+    List<Order> getWeeklyOrdersInBranch(@PathVariable("date") String date) {
+        return orderService.getWeeklyOrdersInBranch(date);
+    }
+    @GetMapping("/branch/monthly/{date}")
+    List<Order> getMonthlyOrdersInBranch(@PathVariable("date") String date) {
+        return orderService.getMonthlyOrdersInBranch(date);
     }
 
-    @GetMapping("branch/find/week")
-    List<Order> findOrdersInAWeekInBranch() {
-        return orderService.findOrdersInAWeekInBranch();
-    }
-
-    @GetMapping("branch/find/month")
-    public List<Order> findOrdersInAMonthInBranch() {
-        return orderService.findOrdersInAMonthInBranch();
-    }
 
     //manager
     @GetMapping("/branch/count/orderByday/{date}")
@@ -154,8 +155,8 @@ public class OrderAPI {
         return orderService.getOrderQuantityByStatus();
     }
 
-    @GetMapping("/manager/topProducts/last3Months")
-    public List<Object[]> getTopProductsLast3Months(String date){
+    @GetMapping("/manager/topProducts/last3Months/{date}")
+    public List<Object[]> getTopProductsLast3Months(@PathVariable("date") String date){
         return orderService.getTopProducts(date);
     }
 }
