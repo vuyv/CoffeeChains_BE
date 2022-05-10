@@ -204,22 +204,36 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public List<Order> findOrdersInCurrentDayInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentDay(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
-        return orders;
+    public List<Order> getDailyOrdersInBranch(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+        return orderRepository.getDailyOrdersInBranch(branchId, StringtoDate(date) );
     }
 
     @Override
-    public List<Order> findOrdersInAWeekInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentWeek(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
-        return orders;
+    public List<Order> getWeeklyOrdersInBranch(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfWeek(selectedDate).toString();
+        String endDate = endOfWeek((selectedDate)).toString();
+
+        return orderRepository.getOrdersInBranchByTime(branchId, StringtoDate(startDate), StringtoDate(endDate)  );
     }
 
     @Override
-    public List<Order> findOrdersInAMonthInBranch() {
-        List<Order> orders = getOrdersInBranch().stream().filter(order -> dateUtil.belongsToCurrentMonth(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
-        return orders;
+    public List<Order> getMonthlyOrdersInBranch(String date) {
+        Employee employee = employeeService.getCurrentEmployee();
+        short branchId = employee.getBranch().getId();
+
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfMonth(selectedDate).toString();
+        String endDate = endOfMonth((selectedDate)).toString();
+
+        return orderRepository.getOrdersInBranchByTime(branchId, StringtoDate(startDate), StringtoDate(endDate)  );
     }
 
     //manager
@@ -399,6 +413,8 @@ public class OrderServiceImpl implements OrderService {
         Date selectedDate = StringtoDate(date);
         String startDate = startOfLast3Months(selectedDate).toString();
         String endDate = endOfLast3Months(selectedDate).toString();
+
+        System.out.println("START 3 MONTH: " + startDate + "END 3 MONTH: " + endDate);
         return orderRepository.getTopProducts(branchId, startDate, endDate);
     }
 }
