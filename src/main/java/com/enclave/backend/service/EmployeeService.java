@@ -38,4 +38,6 @@ public interface EmployeeService extends UserDetailsService {
     Employee getEmployeeByPhone(String phone);
 
     Employee resetPassword(String phone, PasswordResetDTO passwordResetDTO);
+
+    Employee getEmployeeByEmail(String email);
 }

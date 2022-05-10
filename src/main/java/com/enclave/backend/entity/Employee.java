@@ -55,4 +55,7 @@ public class Employee extends AbstractUser {
     public enum Status{
         ACTIVE, INACTIVE
     }
+
+    @Column(length = 30)
+    private String email;
 }

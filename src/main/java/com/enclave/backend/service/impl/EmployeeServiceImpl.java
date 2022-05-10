@@ -199,6 +199,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee getEmployeeByEmail(String email) {
+        return employeeRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email:" + email));
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Employee user = employeeRepository.findByUsername(username);
         if (user == null) {
