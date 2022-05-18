@@ -1,8 +1,12 @@
 package com.enclave.backend.service.report;
 
-import com.enclave.backend.entity.Report;
+import com.enclave.backend.entity.RevenueReport;
+import com.enclave.backend.entity.report.EmployeeReport;
+import com.enclave.backend.entity.report.ProductReport;
+import com.enclave.backend.entity.report.ReportType;
 import com.enclave.backend.service.EmployeeReportService;
 import com.enclave.backend.service.ProductReportService;
+import com.enclave.backend.service.RevenueReportService;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.HtmlExporter;
@@ -15,7 +19,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.awt.print.*;
+import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -30,59 +36,105 @@ import static com.enclave.backend.entity.DateUtil.*;
 @Service
 public class ReportService {
 
-    private final List<Report> reports = new ArrayList<>();
-
     @Autowired
     private EmployeeReportService employeeReportService;
 
     @Autowired
     private ProductReportService productReportService;
 
-    private List<Object[]> queryResult = new ArrayList<>();
+    @Autowired
+    private RevenueReportService revenueReportService;
 
-    private List<Report> getProductsEachBranch(short branchId, short categoryId, String date, String timeRange) {
-        queryResult = productReportService.getByTypeEachBranch(branchId, categoryId, date, timeRange);
+    private List<EmployeeReport> addEmployeeToList(List<Object[]> queryResult){
+        List<EmployeeReport> employeeReportList = new ArrayList<>();
         for (int i = 0; i < queryResult.size(); i++) {
-            Report report = new Report();
-            report.setName((String) queryResult.get(i)[0]);
-            Integer quantity = ((BigDecimal) queryResult.get(i)[1]).intValue();
-            report.setQuantity(quantity);
-            report.setRevenue((Double) queryResult.get(i)[2]);
-            reports.add(report);
-        }
-        return reports;
-    }
-
-    private List<Report> getEmployeesEachBranch(short branchId, String date, String timeRange) {
-        queryResult = employeeReportService.getEachBranch(branchId, date, timeRange);
-        for (int i = 0; i < queryResult.size(); i++) {
-            Report report = new Report();
-            report.setId(i);
-            report.setName((String) queryResult.get(i)[0]);
+            EmployeeReport employeeReport = new EmployeeReport();
+            employeeReport.setId(i);
+            employeeReport.setName((String) queryResult.get(i)[0]);
             Integer quantity = ((BigInteger) queryResult.get(i)[1]).intValue();
+            employeeReport.setQuantity(quantity);
+            employeeReport.setRevenue((Double) queryResult.get(i)[2]);
+            employeeReportList.add(employeeReport);
+        }
+        return employeeReportList;
+    }
+
+    public List<EmployeeReport> getEmployeesForBranch(short branchId, String date, String timeRange) {
+        List<Object[]> queryResult = employeeReportService.getEachBranch(branchId, date, timeRange);
+        return addEmployeeToList(queryResult);
+    }
+
+    private List<ProductReport> addProductToList(List<Object[]> queryResult){
+        List<ProductReport> productReportList = new ArrayList<>();
+        for (int i = 0; i < queryResult.size(); i++) {
+            ProductReport productReport = new ProductReport();
+            productReport.setId(i);
+            productReport.setName((String) queryResult.get(i)[0]);
+            Integer quantity = ((BigDecimal) queryResult.get(i)[1]).intValue();
+            productReport.setQuantity(quantity);
+            productReport.setRevenue((Double) queryResult.get(i)[2]);
+            productReportList.add(productReport);
+        }
+        return productReportList;
+    }
+
+    public List<ProductReport> getProductsByCategoryForBranch(short branchId, short categoryId, String date, String timeRange) {
+        List<Object[]> queryResult = productReportService.getByTypeEachBranch(branchId, categoryId, date, timeRange);
+        return addProductToList(queryResult);
+    }
+
+    public List<ProductReport> getProductsByCategory(short categoryId, String date, String timeRange) {
+        List<Object[]> queryResult = productReportService.getProductByType(categoryId, date, timeRange);
+        return addProductToList(queryResult);
+    }
+
+    private List<RevenueReport> addRevenueToList(List<Object[]> queryResult){
+        List<RevenueReport> revenueReports = new ArrayList<>();
+        for (int i = 0; i < queryResult.size(); i++) {
+            RevenueReport report = new RevenueReport();
+            report.setId(i);
+            report.setBranch((String) queryResult.get(i)[0]);
+            report.setAddress((String) queryResult.get(i)[1]);
+            Integer quantity = ((BigInteger) queryResult.get(i)[2]).intValue();
             report.setQuantity(quantity);
-            report.setRevenue((Double) queryResult.get(i)[2]);
-            reports.add(report);
+            report.setRevenue((Double) queryResult.get(i)[3]);
+            revenueReports.add(report);
         }
-        return reports;
+        return revenueReports;
     }
 
-    public void downloadReport(ExportType exportType, HttpServletResponse response, String type, short branchId, String date, String timeRange, short categoryId) throws JRException, IOException, ParseException, PrinterException {
-        List<Report> list = new ArrayList<>();
-        if (type.equals("Employee")) {
-            list = getEmployeesEachBranch(branchId, date, timeRange);
+    public List<RevenueReport> getRevenueAllBranch(String date, String timeRange) {
+        List<Object[]> queryResult = revenueReportService.getAllBranch(date, timeRange);
+        return addRevenueToList(queryResult);
+    }
+
+    public void generateReportAllBranch(ExportType exportType, HttpServletResponse response, ReportType type, String date, String timeRange, short categoryId) throws JRException, IOException, ParseException, PrinterException {
+        if (ReportType.Revenue.equals(type)) {
+            List<RevenueReport> revenueReportList = getRevenueAllBranch(date, timeRange);
+            exportReport(revenueReportList, exportType, response, type, timeRange, date);
         } else {
-            list = getProductsEachBranch(branchId, categoryId, date, timeRange);
+            List<ProductReport> productReportList = getProductsByCategory(categoryId, date, timeRange);
+            exportReport(productReportList, exportType, response, type, timeRange, date);
         }
-        exportReport(list, exportType, response, type, timeRange, date);
-        list.clear();
     }
 
-    private HashMap<String, Object> setParameters(String type,String timeRange, String dateString) throws ParseException {
+    public void generateReportForBranch(ExportType exportType, HttpServletResponse response, ReportType type, short branchId, String date, String timeRange, short categoryId) throws JRException, IOException, ParseException, PrinterException {
+        if (ReportType.Employee.equals(type)) {
+            List <EmployeeReport> employeeReportList = getEmployeesForBranch(branchId, date, timeRange);
+            exportReport(employeeReportList, exportType, response, type, timeRange, date);
+        } else {
+            List <ProductReport> productReportList = getProductsByCategoryForBranch(branchId, categoryId, date, timeRange);
+            exportReport(productReportList, exportType, response, type, timeRange, date);
+        }
+    }
+
+    private HashMap<String, Object> setParameters(ReportType type, String timeRange, String dateString) throws ParseException {
         HashMap<String, Object> parameters = new HashMap();
         String title = "";
-        if (type.equals("Employee")) {
+        if (ReportType.Employee.equals(type)) {
             title = "Employee Report";
+        } else if (ReportType.Revenue.equals(type)) {
+            title = "Revenue Report";
         } else {
             title = "Product Report";
         }
@@ -90,8 +142,8 @@ public class ReportService {
         parameters.put("timeRange", timeRange);
 
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = LocalDate.now();
+        LocalDate startDate ;
+        LocalDate endDate ;
         if (timeRange.equals("Monthly")) {
             startDate = LocalDate.from(startOfMonth(date));
             endDate = LocalDate.from(endOfMonth(date));
@@ -104,7 +156,7 @@ public class ReportService {
             parameters.put("startDate", startDate);
             parameters.put("endDate", endDate);
         }
-        if(timeRange.equals("Daily")){
+        if (timeRange.equals("Daily")) {
             startDate = LocalDate.from(startOfDay(date));
             endDate = LocalDate.from(endOfDay(date));
             parameters.put("startDate", startDate);
@@ -113,39 +165,61 @@ public class ReportService {
         return parameters;
     }
 
+    public InputStream getReportTemplate(ReportType type) {
+        InputStream reportStream;
+        if (ReportType.Revenue.equals(type)) {
+            reportStream = getClass().getResourceAsStream("/templates/revenueReport.jrxml");
+        } else {
+            reportStream = getClass().getResourceAsStream("/templates/report.jrxml");
+        }
+        return reportStream;
+    }
 
-    private void exportReport(Collection<?> beanCollection, ExportType exportType, HttpServletResponse response, String type, String timeRange, String dateString) throws JRException, IOException, ParseException, PrinterException {
-//        InputStream reportStream = getClass().getResourceAsStream("/templates/report_" + exportType.toString().toLowerCase() + ".jrxml");
-
-        InputStream reportStream = getClass().getResourceAsStream("/templates/report.jrxml");
-        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
-        JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(beanCollection);
-
+    public void exportReport(Collection<?> data, ExportType exportType, HttpServletResponse response, ReportType type, String timeRange, String dateString) throws JRException, IOException, ParseException, PrinterException {
         HashMap<String, Object> parameters = setParameters(type, timeRange, dateString);
-
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, beanColDataSource);
-
-        var fileName = parameters.get("title");
+        JRAbstractExporter exporter = null;
 
         if (exportType == ExportType.PDF) {
-
-            JRPdfExporter exporter = new JRPdfExporter();
-            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
-            response.setContentType("application/pdf");
+            String fileName = (String) parameters.get("title");
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".pdf;");
-            exporter.exportReport();
+            exporter = exportPDF(data, response, type, parameters);
 
         } else if (exportType == ExportType.HTML) {
-//            JasperExportManager.exportReportToHtmlFile(jasperPrint, "C:\\Users\\S\\Downloads\\" + "report.html");
-
-            HtmlExporter exporter = new HtmlExporter(DefaultJasperReportsContext.getInstance());
-            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-            exporter.setExporterOutput(new SimpleHtmlExporterOutput(response.getWriter()));
-            response.setContentType("text/html");
-//            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".html;");
-            exporter.exportReport();
-
+             exporter = exportHTML(data, response, type, parameters);
         }
+        assert exporter != null;
+        exporter.exportReport();
+    }
+    public JasperPrint getJasperPrint(Collection<?> data, ReportType type, HashMap<String, Object> parameters) throws JRException {
+        JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(data);
+        JasperReport jasperReport = JasperCompileManager.compileReport(getReportTemplate(type));
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, beanColDataSource);
+        return jasperPrint;
+    }
+
+    public JRPdfExporter exportPDF(Collection<?> data,HttpServletResponse response, ReportType type, HashMap<String, Object> parameters) throws JRException, IOException {
+        JRPdfExporter exporter = new JRPdfExporter();
+        JasperPrint jasperPrint = getJasperPrint(data, type, parameters);
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+        response.setContentType("application/pdf");
+        return exporter;
+    }
+
+    public HtmlExporter exportHTML(Collection<?> data,HttpServletResponse response, ReportType type, HashMap<String, Object> parameters) throws JRException, IOException {
+        HtmlExporter exporter = new HtmlExporter(DefaultJasperReportsContext.getInstance());
+        JasperPrint jasperPrint = getJasperPrint(data, type, parameters);
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleHtmlExporterOutput(response.getWriter()));
+        response.setContentType("text/html");
+        return exporter;
+    }
+
+    public File getFilePDF(Collection<?> data, ReportType type, String timeRange, String dateString) throws IOException, JRException, ParseException {
+        HashMap<String, Object> parameters = setParameters(type, timeRange, dateString);
+        JasperPrint jasperPrint = getJasperPrint(data, type, parameters);
+        File pdf = File.createTempFile(String.valueOf(parameters.get("title")), ".pdf");
+        JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));
+        return pdf;
     }
 }

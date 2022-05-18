@@ -3,9 +3,10 @@ package com.enclave.backend.entity;
 import lombok.Data;
 
 @Data
-public class Report {
+public class RevenueReport {
     private int id;
-    private String name;
+    private String branch;
+    private String address;
     private Integer quantity;
     private double revenue;
 }
