@@ -1,6 +1,7 @@
 package com.enclave.backend.quartz;
 
 import com.enclave.backend.quartz.job.detail.DailySenderJobDetail;
+import com.enclave.backend.quartz.job.detail.WeeklyMailSenderJobDetail;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -9,16 +10,18 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class DailyMailScheduler {
+public class MailScheduler {
     private final Scheduler scheduler;
     private final DailySenderJobDetail dailySenderJobDetail;
+    private final WeeklyMailSenderJobDetail weeklyMailSenderJobDetail;
 
     public void start() throws SchedulerException {
         this.scheduler.start();
         this.scheduler.addJob(dailySenderJobDetail.getJobDetail(), false);
+        this.scheduler.addJob(weeklyMailSenderJobDetail.getJobDetail(), false);
     }
 
-    public void addTriggerInDailyMailService(Trigger trigger) {
+    public void addTrigger(Trigger trigger) {
         try {
             this.scheduler.scheduleJob(trigger);
             log.info("Successfully scheduled trigger with identity: {}", trigger.getKey());
@@ -40,9 +43,9 @@ public class DailyMailScheduler {
         }
     }
 
-    public Boolean triggerWithEmailScheduled(final String emailId) {
+    public Boolean triggerWithEmailScheduled(final String email) {
         try {
-            return this.scheduler.checkExists(new TriggerKey(emailId));
+            return this.scheduler.checkExists(new TriggerKey(email));
         } catch (SchedulerException e) {
             log.error("Unable to check for trigger existence: {}", e);
             throw new RuntimeException();

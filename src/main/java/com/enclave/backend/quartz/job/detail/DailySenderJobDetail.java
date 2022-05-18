@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DailySenderJobDetail {
-    private static final JobDetail jobDetails = JobBuilder.newJob(DailyMailSenderJob.class).withIdentity("daily-mail-sender-job", "DEFAULT").storeDurably().build();
+    private static final JobDetail jobDetails = JobBuilder.newJob(DailyMailSenderJob.class)
+            .withIdentity("daily-mail-sender-job", "DEFAULT").storeDurably().build();
     public JobDetail getJobDetail() {
         return jobDetails;
     }
+
 }

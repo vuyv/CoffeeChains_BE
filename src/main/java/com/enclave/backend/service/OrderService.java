@@ -5,7 +5,6 @@ import com.enclave.backend.entity.Order;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderService {
 
@@ -13,7 +12,7 @@ public interface OrderService {
 
     Order findOrderById(String id);
 
-    Optional<Order> findOrderByOrdinalNumber(int ordinalNumber);
+    Order findOrderByOrdinalNumber(int ordinalNumber);
 
     Order cancelOrder(String id);
 

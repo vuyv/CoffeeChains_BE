@@ -1,6 +1,6 @@
 package com.enclave.backend.service;
 
-import com.enclave.backend.quartz.DailyMailScheduler;
+import com.enclave.backend.quartz.MailScheduler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class DailyMailSchedulerInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
-    private final DailyMailScheduler dailyMailScheduler;
+    private final MailScheduler dailyMailScheduler;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {

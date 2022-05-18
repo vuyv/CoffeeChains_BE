@@ -178,7 +178,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         newEmployee.setPassword(passwordEncode.encode("123123"));
         newEmployee.setStatus(Employee.Status.ACTIVE);
-        employeeRepository.save(newEmployee);
+//        employeeRepository.save(newEmployee);
         return employeeRepository.save(newEmployee);
     }
 
@@ -202,6 +202,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee getEmployeeByEmail(String email) {
         return employeeRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email:" + email));
     }
+
+    @Override
+    public Employee getEmployeeHasRoleOwner(){
+        List<Employee> allEmployees = employeeRepository.findAll();
+        return allEmployees.stream().filter(employee -> employee.getRole().getName().equals("OWNER")).findFirst().get();
+    }
+
+    @Override
+    public List<Employee> getEmployeeHasRoleManager(){
+        List<Employee> allEmployees = employeeRepository.findAll();
+        List<Employee> managers = new ArrayList<>();
+        allEmployees.forEach(employee -> {
+            if ("MANAGER".equals(employee.getRole().getName())){
+                managers.add(employee);
+            }
+        });
+        return managers;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
