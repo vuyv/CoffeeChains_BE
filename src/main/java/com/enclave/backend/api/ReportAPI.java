@@ -1,5 +1,6 @@
 package com.enclave.backend.api;
 
+import com.enclave.backend.entity.report.ReportType;
 import com.enclave.backend.service.EmployeeReportService;
 import com.enclave.backend.service.ProductReportService;
 import com.enclave.backend.service.RevenueReportService;
@@ -53,10 +54,17 @@ public class ReportAPI {
         return employeeReportService.getEachBranch(branchId,date, timeRange);
     }
 
-    @GetMapping(value = "/manager/export")
-    ResponseEntity<Void> generateReport(@RequestParam(value = "exportType") ExportType exportType, HttpServletResponse response, @RequestParam("branchId") short branchId, @RequestParam("date") String date,
-                                                   @RequestParam("timeRange")String timeRange, @RequestParam("type") String type, @RequestParam("categoryId") short categoryId) throws JRException, IOException, ParseException, PrinterException {
-        reportService.downloadReport( exportType,  response,type, branchId,  date,  timeRange, categoryId);
+    @GetMapping(value = "manager/export")
+    ResponseEntity<Void> generateReportEachBranch(@RequestParam(value = "exportType") ExportType exportType, HttpServletResponse response, @RequestParam("branchId") short branchId, @RequestParam("date") String date,
+                                                   @RequestParam("timeRange")String timeRange, @RequestParam("type") ReportType type, @RequestParam("categoryId") short categoryId) throws JRException, IOException, ParseException, PrinterException {
+        reportService.generateReportForBranch( exportType,  response,type, branchId,  date,  timeRange, categoryId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/owner/export")
+    ResponseEntity<Void> generateReportAllBranch(@RequestParam(value = "exportType") ExportType exportType, HttpServletResponse response, @RequestParam("date") String date,
+                                                 @RequestParam("timeRange")String timeRange, @RequestParam("type") ReportType type, @RequestParam("categoryId") short categoryId) throws JRException, IOException, ParseException, PrinterException {
+        reportService.generateReportAllBranch( exportType,  response,type,  date,  timeRange, categoryId);
         return ResponseEntity.ok().build();
     }
 }

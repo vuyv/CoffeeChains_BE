@@ -107,5 +107,4 @@ public class EmployeeAPI {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't reset password", e);
         }
     }
-
 }

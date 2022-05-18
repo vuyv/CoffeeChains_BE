@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/order")
@@ -48,7 +47,7 @@ public class OrderAPI {
     }
 
     @GetMapping("/find/{ordinalNumber}")
-    public Optional<Order> findOrderByOrdinalNumber(@PathVariable("ordinalNumber") int ordinalNumber) {
+    public Order findOrderByOrdinalNumber(@PathVariable("ordinalNumber") int ordinalNumber) {
         return orderService.findOrderByOrdinalNumber(ordinalNumber);
     }
 
