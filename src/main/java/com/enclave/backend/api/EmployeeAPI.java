@@ -108,4 +108,9 @@ public class EmployeeAPI {
         }
     }
 
+    //owner see detail branch
+    @GetMapping("/countOfBranch/{branchId}")
+    public int getCountEmployeeEachBranch(@PathVariable("branchId") short branchId){
+        return employeeService.getCountEmployeeEachBranch(branchId);
+    }
 }

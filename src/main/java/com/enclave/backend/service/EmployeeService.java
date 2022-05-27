@@ -32,6 +32,7 @@ public interface EmployeeService extends UserDetailsService {
     Long getCountOfAllEmployee();
 
     int getCountOfBranchEmployee();
+    int getCountEmployeeEachBranch(short branchId);
 
     List<Object[]> getCountOfEmployeeEachBranch();
 

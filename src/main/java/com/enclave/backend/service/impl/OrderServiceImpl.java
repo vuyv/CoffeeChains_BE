@@ -240,16 +240,22 @@ public class OrderServiceImpl implements OrderService {
     //Chart: weekly revenue
     @Override
     public List<Object[]> getCountOfTotalPriceInBranchWeekly(String date) {
-
         Date selectedDate = StringtoDate(date);
-        String startDate = startOfWeek(selectedDate).toString();
-        String endDate = endOfWeek((selectedDate)).toString();
 
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
 
-        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, startDate,endDate );
+        String last7days = last7days(selectedDate).toString();
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days,date );
 
+        return queryResult;
+    }
+
+    @Override
+    public List<Object[]> getCountOfTotalPriceEachBranchWeekly(String date, short branchId) {
+        Date selectedDate = StringtoDate(date);
+        String last7days = last7days(selectedDate).toString();
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days,date );
 
         return queryResult;
     }
@@ -268,9 +274,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public int getCountOfEachBranchOrderByDate(String date, short branchId) {
+        int count = 0;
+        try {
+            count = orderRepository.getCountOfBranchOrderByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return count;
+    }
+
+    @Override
     public double getCountOfBranchTotalPriceByDate(String date) {
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
+        double count = 0;
+        try {
+            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return count;
+    }
+
+    @Override
+    public double getCountOfEachBranchTotalPriceByDate(String date, short branchId) {
         double count = 0;
         try {
             count = orderRepository.getCountOfBranchTotalPriceByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
@@ -333,6 +361,7 @@ public class OrderServiceImpl implements OrderService {
         return compare;
     }
 
+
     @Override
     public double compareLastWeekRevenue() {
         double lastWeekRevenue = orderRepository.getLastWeekRevenue();
@@ -383,9 +412,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public double getWeeklyRevenueInBranch(short branchId) {
+        return orderRepository.getWeeklyRevenueEachBranch(branchId);
+    }
+
+    @Override
     public double getCurrentMonthRevenueEachBranch() {
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
+        return orderRepository.getCurrentMonthRevenueEachBranch(branchId);
+    }
+
+    @Override
+    public double getCurrentMonthRevenueInBranch(short branchId) {
         return orderRepository.getCurrentMonthRevenueEachBranch(branchId);
     }
 
@@ -400,9 +439,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public double compareLastMonthOfBranchRevenue(short branchId) {
+        double lastMonthRevenue =  orderRepository.getLastMonthRevenueEachBranch(branchId);
+        double currentMonthRevenue = orderRepository.getCurrentMonthRevenueEachBranch(branchId);
+        double compare = currentMonthRevenue - lastMonthRevenue;
+        return compare;
+    }
+
+    @Override
     public List<Object[]> getOrderQuantityByStatus() {
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
+        return orderRepository.getMonthlyOrderQuantityBranchBothStatus(branchId);
+    }
+
+    @Override
+    public List<Object[]> getOrderQuantityByStatusEachBranch(short branchId) {
         return orderRepository.getMonthlyOrderQuantityBranchBothStatus(branchId);
     }
 
@@ -411,10 +463,18 @@ public class OrderServiceImpl implements OrderService {
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
         Date selectedDate = StringtoDate(date);
-        String startDate = startOfLast3Months(selectedDate).toString();
-        String endDate = endOfLast3Months(selectedDate).toString();
+        String startDate = startOfLastMonth(selectedDate).toString();
+        String endDate = endOfLastMonth(selectedDate).toString();
 
-        System.out.println("START 3 MONTH: " + startDate + "END 3 MONTH: " + endDate);
+        return orderRepository.getTopProducts(branchId, startDate, endDate);
+    }
+
+    @Override
+    public List<Object[]> getTopProductsEachBranch(String date, short branchId) {
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfLastMonth(selectedDate).toString();
+        String endDate = endOfLastMonth(selectedDate).toString();
+
         return orderRepository.getTopProducts(branchId, startDate, endDate);
     }
 }

@@ -34,10 +34,13 @@ public interface OrderService {
 
     //manager
     int getCountOfBranchOrderByDate(String date);
+    int getCountOfEachBranchOrderByDate(String date, short branchId);
 
     double getCountOfBranchTotalPriceByDate(String date);
+    double getCountOfEachBranchTotalPriceByDate(String date, short branchId);
 
     List<Object[]> getCountOfTotalPriceInBranchWeekly(String date);
+    List<Object[]> getCountOfTotalPriceEachBranchWeekly(String date, short branchId);
 
     //owner
     double getCountOfAllTotalPriceByDate(String date);
@@ -61,13 +64,17 @@ public interface OrderService {
     List<Object[]> getBestSellingProducts();
     // MANAGER
     double getWeeklyRevenueEachBranch();
+    double getWeeklyRevenueInBranch(short branchId);
 
     double getCurrentMonthRevenueEachBranch();
+    double getCurrentMonthRevenueInBranch(short branchId);
 
     double compareLastMonthBranchRevenue();
+    double compareLastMonthOfBranchRevenue(short branchId);
 
     List<Object[]> getOrderQuantityByStatus();
+    List<Object[]> getOrderQuantityByStatusEachBranch(short branchId);
 
     List<Object[]> getTopProducts(String date);
-
+    List<Object[]> getTopProductsEachBranch(String date, short branchId);
 }

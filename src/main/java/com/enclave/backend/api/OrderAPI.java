@@ -73,15 +73,27 @@ public class OrderAPI {
     public Integer getCountOfBranchOrderByDate(@PathVariable("date") String date) {
         return orderService.getCountOfBranchOrderByDate(date);
     }
+    @GetMapping("/branch/{branchId}/count/orderByday/{date}")
+    public Integer getCountOfEachBranchOrderByDate(@PathVariable("date") String date, @PathVariable("branchId") short branchId) {
+        return orderService.getCountOfEachBranchOrderByDate(date, branchId);
+    }
 
     @GetMapping("/branch/count/totalPriceByday/{date}")
     double getCountOfBranchTotalPriceByDate(@PathVariable("date") String date) {
         return orderService.getCountOfBranchTotalPriceByDate(date);
     }
+    @GetMapping("/branch/{branchId}/count/totalPriceByday/{date}")
+    double getCountOfEachBranchTotalPriceByDate(@PathVariable("date") String date, @PathVariable("branchId") short branchId) {
+        return orderService.getCountOfEachBranchTotalPriceByDate(date, branchId);
+    }
 
     @GetMapping("/branch/count/lastweek/{date}")
     public List<Object[]> getCountOfTotalPriceInBranchWeekly(@PathVariable("date") String date) {
         return orderService.getCountOfTotalPriceInBranchWeekly(date);
+    }
+    @GetMapping("/branch/{branchId}/count/lastweek/{date}")
+    public List<Object[]> getCountOfTotalPriceEachBranchWeekly(@PathVariable("date") String date, @PathVariable("branchId") short branchId) {
+        return orderService.getCountOfTotalPriceEachBranchWeekly(date, branchId);
     }
 
     @GetMapping("/manager/bestSellingProducts")
@@ -140,9 +152,19 @@ public class OrderAPI {
         return orderService.getWeeklyRevenueEachBranch();
     }
 
+    @GetMapping("/manager/{branchId}/revenue/currentWeek")
+    public double getWeeklyRevenueInBranch(@PathVariable("branchId") short branchId) {
+        return orderService.getWeeklyRevenueInBranch(branchId);
+    }
+
     @GetMapping("/manager/revenue/currentMonth")
     public double getCurrentMonthRevenueEachBranch() {
         return orderService.getCurrentMonthRevenueEachBranch();
+    }
+
+    @GetMapping("/manager/{branchId}/revenue/currentMonth")
+    public double getCurrentMonthRevenueInBranch(@PathVariable("branchId") short branchId) {
+        return orderService.getCurrentMonthRevenueInBranch(branchId);
     }
 
     @GetMapping("/manager/compare/lastMonth")
@@ -150,13 +172,27 @@ public class OrderAPI {
         return orderService.compareLastMonthBranchRevenue();
     }
 
+    @GetMapping("/manager/{branchId}/compare/lastMonth")
+    public double compareLastMonthOfBranchRevenue( @PathVariable("branchId") short branchId){
+        return orderService.compareLastMonthOfBranchRevenue(branchId);
+    }
+
     @GetMapping("/manager/orderQuantity/monthly")
     public List<Object[]> getOrderQuantityByStatus(){
         return orderService.getOrderQuantityByStatus();
     }
 
+    @GetMapping("/manager/{branchId}/orderQuantity/monthly")
+    public List<Object[]> getOrderQuantityByStatusEachBranch(@PathVariable("branchId") short branchId){
+        return orderService.getOrderQuantityByStatusEachBranch(branchId);
+    }
+
     @GetMapping("/manager/topProducts/last3Months/{date}")
     public List<Object[]> getTopProductsLast3Months(@PathVariable("date") String date){
         return orderService.getTopProducts(date);
+    }
+    @GetMapping("/branch/{branchId}/topProducts/last3Months/{date}")
+    public List<Object[]> getTopProductsLast3MonthsEachBranch(@PathVariable("date") String date,  @PathVariable("branchId") short branchId){
+        return orderService.getTopProductsEachBranch(date, branchId);
     }
 }
