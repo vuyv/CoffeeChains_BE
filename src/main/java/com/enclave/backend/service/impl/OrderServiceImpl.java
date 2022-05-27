@@ -12,11 +12,13 @@ import com.enclave.backend.service.DiscountService;
 import com.enclave.backend.service.OrderIdGenerator;
 import com.enclave.backend.service.OrderService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.enclave.backend.entity.DateUtil.*;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -52,8 +56,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderDetailConverter orderDetailConverter;
 
-    @Autowired
-    private DateUtil dateUtil;
 
     private List<ProductInOrderDTO> getListProductInFE(List<OrderDetailDTO> orderDetailDTOs) {
         List<ProductInOrderDTO> productsInFE = new ArrayList<>();
@@ -115,6 +117,7 @@ public class OrderServiceImpl implements OrderService {
         if (!isValidProduct(orderDTO)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid product").body(null);
         }
+        DecimalFormat format = new DecimalFormat("#.##");
 
         double total = calculateTotal(orderDTO.getOrderDetails(), getListProductInDB(orderDTO.getOrderDetails()));
         Date date = new Date();
@@ -135,17 +138,21 @@ public class OrderServiceImpl implements OrderService {
 
         if (orderDTO.getDiscount_code() != "" ) {
             total = applyDiscountCode(total, orderDTO.getDiscount_code(), date);
-            if (isValidTotal(orderDTO, total)) {
+            log.info("Total " + total);
+            log.info(String.valueOf(isValidTotal(orderDTO, Double.parseDouble(format.format(total)))));
+            if (isValidTotal(orderDTO, Double.parseDouble(format.format(total)))) {
                 newOrder.setDiscount(discountService.getDiscountByCode(orderDTO.getDiscount_code()));
-                newOrder.setTotalPrice(total);
+                newOrder.setTotalPrice(Double.parseDouble(format.format(total)));
                 orderRepository.save(newOrder);
                 return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
         }
+        log.info("Total " + Double.parseDouble(format.format(total)));
+        log.info(String.valueOf(isValidTotal(orderDTO, Double.parseDouble(format.format(total)))));
 
-        if (isValidTotal(orderDTO, total)) {
-            newOrder.setTotalPrice(total);
+        if (isValidTotal(orderDTO, Double.parseDouble(format.format(total)))) {
+            newOrder.setTotalPrice(Double.parseDouble(format.format(total)));
             orderRepository.save(newOrder);
             return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
         }
@@ -219,9 +226,7 @@ public class OrderServiceImpl implements OrderService {
     ///////////////////////////////////////////////////////////////////////////////
     @Override
     public List<Order> getDailyOrdersInBranch(String date) {
-        Employee employee = employeeService.getCurrentEmployee();
-        short branchId = employee.getBranch().getId();
-        return orderRepository.getDailyOrdersInBranch(branchId, StringtoDate(date) );
+        return getOrdersInBranch().stream().filter(order -> belongsToCurrentDay(toLocalDate(order.getCreatedAt()))).collect(Collectors.toList());
     }
 
     @Override

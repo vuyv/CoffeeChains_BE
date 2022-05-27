@@ -85,7 +85,7 @@ public class DateUtil {
         return dateResult;
     }
 
-    public boolean belongsToCurrentDay(final LocalDateTime localDateTime) {
+    public static boolean belongsToCurrentDay(final LocalDateTime localDateTime) {
         return localDateTime.isAfter(startOfDay()) && localDateTime.isBefore(endOfDay());
     }
 
