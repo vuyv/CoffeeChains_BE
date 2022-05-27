@@ -93,6 +93,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public int getCountEmployeeEachBranch(short branchId) {
+        return employeeRepository.getCountOfBranchEmployee(branchId);
+    }
+
+    @Override
     public List<Object[]> getCountOfEmployeeEachBranch() {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {

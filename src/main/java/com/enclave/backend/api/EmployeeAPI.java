@@ -107,4 +107,10 @@ public class EmployeeAPI {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't reset password", e);
         }
     }
+
+    //owner see detail branch
+    @GetMapping("/countOfBranch/{branchId}")
+    public int getCountEmployeeEachBranch(@PathVariable("branchId") short branchId){
+        return employeeService.getCountEmployeeEachBranch(branchId);
+    }
 }

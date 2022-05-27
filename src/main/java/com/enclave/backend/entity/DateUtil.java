@@ -73,6 +73,10 @@ public class DateUtil {
         LocalDate localDate = LocalDate.from(toLocalDate(date));
         return LocalDateTime.of(localDate, LocalTime.MAX);
     }
+    public static LocalDateTime last7days(Date date){
+        LocalDate localDate = LocalDate.from(toLocalDate(date)).minusDays(6);
+        return LocalDateTime.of(localDate, LocalTime.MIN);
+    }
 
     //convert String to Date
     public static Date StringtoDate(String dateString) {
@@ -146,14 +150,14 @@ public class DateUtil {
         return LocalDateTime.of(lastDayOfQuarter,  LocalTime.MAX);
     }
 
-    public static LocalDateTime startOfLast3Months(Date date) {
+    public static LocalDateTime startOfLastMonth(Date date) {
         LocalDate localDate = LocalDate.from(toLocalDate(date));
-        LocalDate firstDay = YearMonth.of(localDate.getYear(), localDate.getMonth().minus(3))
+        LocalDate firstDay = YearMonth.of(localDate.getYear(), localDate.getMonth().minus(1))
                 .atDay(1);
         return LocalDateTime.of(firstDay,  LocalTime.MIN);
     }
 
-    public static LocalDateTime endOfLast3Months(Date date) {
+    public static LocalDateTime endOfLastMonth(Date date) {
         LocalDate localDate = LocalDate.from(toLocalDate(date));
         LocalDate lastDay = YearMonth.of(localDate.getYear(), localDate.getMonth().minus(1))
                 .atEndOfMonth();

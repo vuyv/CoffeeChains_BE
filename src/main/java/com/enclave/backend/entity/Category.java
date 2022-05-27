@@ -27,6 +27,9 @@ public class Category {
     @Column(length = 30)
     private String name;
 
+    @Column
+    private String image;
+
     @JsonIgnore
     @OneToMany(mappedBy = "category")
     private Set<Product> products = new HashSet<>();
