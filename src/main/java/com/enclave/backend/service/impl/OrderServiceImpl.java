@@ -157,15 +157,25 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findOrderById(String id) {
-        return orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid order Id: " + id));
+        Optional<Order> orderOptional =  orderRepository.findById(id);
+        Order order = null;
+        if (orderOptional.isPresent()){
+            order = orderOptional.get();
+        }
+        return order;
     }
 
     @Override
-    public Optional<Order> findOrderByOrdinalNumber(int ordinalNumber) {
+    public Order findOrderByOrdinalNumber(int ordinalNumber) {
         Date currentDate = new Date();
         StringBuilder key = orderIdGenerator.generateKey(employeeService.getCurrentEmployee().getBranch(), currentDate);
         String orderId = String.valueOf(key.append(String.format("%03d", ordinalNumber)));
-        return orderRepository.findById(orderId);
+        Optional<Order> orderOptional =  orderRepository.findById(orderId);
+        Order order = null;
+        if (orderOptional.isPresent()){
+           order = orderOptional.get();
+        }
+        return order;
     }
 
     public boolean isSameDay(Date date1, Date date2) {
@@ -360,7 +370,6 @@ public class OrderServiceImpl implements OrderService {
         double compare = currentMonthRevenue - lastMonthRevenue;
         return compare;
     }
-
 
     @Override
     public double compareLastWeekRevenue() {

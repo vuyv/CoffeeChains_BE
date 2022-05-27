@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import java.io.IOException;
 
-//@EnableCaching
+@EnableCaching
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class BackendApplication {
 
@@ -19,7 +19,8 @@ public class BackendApplication {
 //                .setCredentials(googleCredentials)
 //                .build();
 //        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions);
-        SpringApplication.run(BackendApplication.class, args);
+
+            SpringApplication.run(BackendApplication.class, args);
     }
 }
 

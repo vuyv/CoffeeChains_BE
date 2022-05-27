@@ -77,17 +77,6 @@ public class DiscountServiceImpl implements DiscountService {
         Discount discount = discountRepository.findById(code).orElseThrow(() -> new IllegalArgumentException("Invalid discount code: " + code));
         return discount.getStartedAt().compareTo(currentDate) * currentDate.compareTo(discount.getEndedAt()) >= 0 ? discount : null;
     }
-
-//    private boolean isHappeningDiscount(Discount discount, Date currentDate) {
-//        Date startedAt = discount.getStartedAt();
-//        Date endedAt = discount.getEndedAt();
-//
-//        if (startedAt.equals(currentDate) || endedAt.equals(currentDate)) {
-//            return true;
-//        }
-//        return startedAt.before(currentDate) && endedAt.after(currentDate);
-//    }
-
     @Override
     public List<Discount> getHappeningDiscounts() {
         List<Discount> discounts = discountRepository.findAll();

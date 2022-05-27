@@ -80,7 +80,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY FROM order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN employee on orders.created_by = employee.id JOIN branch on employee.branch_id = branch.id where orders.status=\"CREATED\" and employee.branch_id = :branchId AND week(orders.created_at)=week(now()) group by product.name order by QUANTITY desc LIMIT 6", nativeQuery = true)
     List<Object[]> getBestSellingProducts(@Param("branchId") short branchId);
 
-//    @Cacheable("topProducts")
+    @Cacheable("topProducts")
     @Query(value = "SELECT product.name, sum(order_detail.quantity) AS QUANTITY FROM order_detail JOIN orders ON orders.id = order_detail.order_id JOIN product ON order_detail.product_id = product.id JOIN employee on orders.created_by = employee.id  where orders.status=\"CREATED\" and employee.branch_id = :branchId AND orders.created_at BETWEEN :startDate AND :endDate  group by product.name order by quantity desc LIMIT 6", nativeQuery = true)
     List<Object[]> getTopProducts(@Param("branchId") short branchId, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
