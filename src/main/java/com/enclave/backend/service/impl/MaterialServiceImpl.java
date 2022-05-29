@@ -1,7 +1,6 @@
 package com.enclave.backend.service.impl;
 
 import com.enclave.backend.entity.Material;
-import com.enclave.backend.entity.UnitConverter;
 import com.enclave.backend.repository.MaterialRepository;
 import com.enclave.backend.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,4 +22,5 @@ public class MaterialServiceImpl implements MaterialService {
     public List<Object[]> getUnitByMaterial(short materialId) {
         return materialRepository.getUnitByMaterial(materialId);
     }
+
 }

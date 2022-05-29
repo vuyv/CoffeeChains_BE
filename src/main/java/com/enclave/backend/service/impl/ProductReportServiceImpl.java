@@ -74,7 +74,7 @@ public class ProductReportServiceImpl implements ProductReportService {
                 startDate = startOfMonth(selectedDate).toString();
                 endDate = endOfMonth((selectedDate)).toString();
             }
-            if(type.equals("Quarter")){
+            if(type.equals("Quarterly")){
                 startDate = startOfQuarter(selectedDate).toString();
                 endDate = endOfQuarter((selectedDate)).toString();
             }
