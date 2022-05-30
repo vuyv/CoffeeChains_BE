@@ -2,11 +2,13 @@ package com.enclave.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@Lazy
 @Table(name = "orderDetail")
 public class OrderDetail{
 

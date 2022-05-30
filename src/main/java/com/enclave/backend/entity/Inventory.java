@@ -27,7 +27,7 @@ public class Inventory {
     private double quantity;
 
     @ManyToOne
-    private UnitConverter unit;
+    private Unit unit;
 
     @Column
     private Date createdAt;

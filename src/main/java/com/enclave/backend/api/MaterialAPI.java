@@ -1,6 +1,7 @@
 package com.enclave.backend.api;
 
 import com.enclave.backend.dto.InventoryDTO;
+import com.enclave.backend.dto.MaterialDTO;
 import com.enclave.backend.entity.Inventory;
 import com.enclave.backend.entity.Material;
 import com.enclave.backend.service.InventoryService;
@@ -27,12 +28,17 @@ public class MaterialAPI {
         return materialService.getAllMaterial();
     }
 
-    @GetMapping("/unit/{materialId}")
-    public List<Object[]> getUnitByMaterial(@PathVariable("materialId") short materialId) {
-        return materialService.getUnitByMaterial(materialId);
+    @GetMapping("/{materialId}")
+    public Material getMaterialById(@PathVariable("materialId") short materialId) {
+        return materialService.getMaterialById(materialId);
     }
 
     @PostMapping("/new")
+    public Material createMaterial(@RequestBody MaterialDTO materialDTO){
+        return materialService.createMaterial(materialDTO);
+    }
+
+    @PostMapping("/addToInventory")
     public ResponseEntity<String> addMaterials(@RequestBody List<InventoryDTO> inventoryDTOs){
         return inventoryService.addMaterials(inventoryDTOs);
     }
