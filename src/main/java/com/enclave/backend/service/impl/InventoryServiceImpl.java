@@ -4,7 +4,7 @@ import com.enclave.backend.converter.InventoryConverter;
 import com.enclave.backend.dto.InventoryDTO;
 import com.enclave.backend.entity.Inventory;
 import com.enclave.backend.entity.Material;
-import com.enclave.backend.entity.UnitConverter;
+import com.enclave.backend.entity.Unit;
 import com.enclave.backend.repository.InventoryRepository;
 import com.enclave.backend.repository.MaterialRepository;
 import com.enclave.backend.repository.UnitRepository;
@@ -47,7 +47,7 @@ public class InventoryServiceImpl implements InventoryService {
             Inventory inventory = inventoryConverter.toEntity(inventoryDTO);
             Material rawMaterial = materialRepository.findById(inventoryDTO.getMaterialId()).get();
             inventory.setRawMaterial(rawMaterial);
-            UnitConverter unitConverter = unitRepository.findById(inventoryDTO.getUnitId()).get();
+            Unit unitConverter = unitRepository.findById(inventoryDTO.getUnitId()).get();
             inventory.setUnit(unitConverter);
             inventory.setQuantity(inventoryDTO.getQuantity());
             inventory.setBranch(employeeService.getCurrentEmployee().getBranch());
