@@ -26,7 +26,9 @@ public class Inventory {
     @Column(length = 30)
     private double quantity;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "unitId")
+    @MapsId("unitId")
     private Unit unit;
 
     @Column
