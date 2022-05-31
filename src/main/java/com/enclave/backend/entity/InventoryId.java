@@ -15,4 +15,6 @@ public class InventoryId implements Serializable {
     @Column(name = "branchId")
     private short branchId;
 
+    @Column(name = "unitId")
+    private short unitId;
 }
