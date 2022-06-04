@@ -211,41 +211,41 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findOrderByIdInBranch(short branchId, String orderId) {
-        Date currentDate = new Date();
         Order order = orderRepository.findOrderByIdInBranch(branchId, orderId);
         return order;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
     @Override
     public List<Order> getDailyOrdersInBranch(String date) {
-        Employee employee = employeeService.getCurrentEmployee();
-        short branchId = employee.getBranch().getId();
-        return orderRepository.getDailyOrdersInBranch(branchId, StringtoDate(date) );
+        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
+
+        Date selectedDate = StringtoDate(date);
+        String startDate = startOfDay(selectedDate).toString();
+        String endDate = endOfDay((selectedDate)).toString();
+
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate );
     }
 
     @Override
     public List<Order> getWeeklyOrdersInBranch(String date) {
-        Employee employee = employeeService.getCurrentEmployee();
-        short branchId = employee.getBranch().getId();
+        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfWeek(selectedDate).toString();
         String endDate = endOfWeek((selectedDate)).toString();
 
-        return orderRepository.getOrdersInBranchByTime(branchId, StringtoDate(startDate), StringtoDate(endDate)  );
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate  );
     }
 
     @Override
     public List<Order> getMonthlyOrdersInBranch(String date) {
-        Employee employee = employeeService.getCurrentEmployee();
-        short branchId = employee.getBranch().getId();
+        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfMonth(selectedDate).toString();
         String endDate = endOfMonth((selectedDate)).toString();
 
-        return orderRepository.getOrdersInBranchByTime(branchId, StringtoDate(startDate), StringtoDate(endDate)  );
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate  );
     }
 
     //manager
