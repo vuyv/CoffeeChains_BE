@@ -18,12 +18,9 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query("SELECT o FROM Order o WHERE o.createdBy.branch.id= :branchId AND o.id = :id")
     Order findOrderByIdInBranch(@Param("branch") short branchId, @Param("id") String id);
 
-    ///////////////////////////////////////////////////////////////////////
-    @Query("SELECT o FROM Order o WHERE o.createdBy.branch.id= :branchId AND o.createdAt = :date")
-    List<Order> getDailyOrdersInBranch(@Param("branch") short branchId, @Param("date") Date date);
 
-    @Query("SELECT o FROM Order o WHERE o.createdBy.branch.id= :branchId AND o.createdAt between :startDate and :endDate")
-    List<Order> getOrdersInBranchByTime(@Param("branch") short branchId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    @Query(value="SELECT * FROM orders join employee on employee.id = orders.created_by WHERE employee.branch_id = :branchId AND orders.created_at between :startDate and :endDate", nativeQuery = true)
+    List<Order> getOrdersInBranchByTime(@Param("branch") short branchId, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
     //MANAGER
     @Query(value = "SELECT COUNT(*) FROM Orders, employee WHERE orders.created_by = employee.id AND DATE(orders.created_at) = DATE(:date) AND employee.branch_id = :branchId", nativeQuery = true)
