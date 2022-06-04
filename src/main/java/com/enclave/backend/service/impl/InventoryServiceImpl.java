@@ -3,8 +3,10 @@ package com.enclave.backend.service.impl;
 import com.enclave.backend.converter.InventoryConverter;
 import com.enclave.backend.dto.InventoryDTO;
 import com.enclave.backend.entity.Inventory;
+import com.enclave.backend.entity.InventoryHistory;
 import com.enclave.backend.entity.Material;
 import com.enclave.backend.entity.Unit;
+import com.enclave.backend.repository.InventoryHistoryRepository;
 import com.enclave.backend.repository.InventoryRepository;
 import com.enclave.backend.service.EmployeeService;
 import com.enclave.backend.service.InventoryService;
@@ -38,35 +40,43 @@ public class InventoryServiceImpl implements InventoryService {
     @Autowired
     private UnitService unitService;
 
-    private Inventory existInventory(InventoryDTO inventoryDTO) {
-        List<Inventory> inventoryList = getMaterialsByBranch();
-        for (Inventory inventory : inventoryList) {
-            if (inventory.getRawMaterial().getId() == inventoryDTO.getMaterialId() && inventory.getUnit().getId() ==
-                    inventoryDTO.getUnitId()) {
-                return inventory;
-            }
-        }
-        return null;
+    @Autowired
+    private InventoryHistoryRepository inventoryHistoryRepository;
+
+    @Override
+    public Inventory getInventoryById(short materialId, short unitId) {
+        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
+        return inventoryRepository.getInventoryById(branchId, materialId, unitId);
     }
 
     @Override
     public ResponseEntity<String> addMaterials(List<InventoryDTO> inventoryDTOs) {
         inventoryDTOs.forEach(inventoryDTO -> {
-            if (Objects.nonNull(existInventory(inventoryDTO))) {
-                Inventory inventory = existInventory(inventoryDTO);
+            Inventory inventory = getInventoryById(inventoryDTO.getMaterialId(), inventoryDTO.getUnitId());
+            if (Objects.nonNull(inventory)) {
                 double quantity = inventory.getQuantity();
                 inventory.setQuantity(quantity + inventoryDTO.getQuantity());
+                inventory.setCreatedAt(new Date());
                 inventoryRepository.save(inventory);
+            } else {
+                Inventory newInventory = inventoryConverter.toEntity(inventoryDTO);
+                Material rawMaterial = materialService.getMaterialById(inventoryDTO.getMaterialId());
+                newInventory.setRawMaterial(rawMaterial);
+                Unit unit = unitService.findById(inventoryDTO.getUnitId());
+                newInventory.setUnit(unit);
+                newInventory.setQuantity(inventoryDTO.getQuantity());
+                newInventory.setBranch(employeeService.getCurrentEmployee().getBranch());
+                newInventory.setCreatedAt(new Date());
+                inventoryRepository.save(newInventory);
             }
-            Inventory newInventory = inventoryConverter.toEntity(inventoryDTO);
-            Material rawMaterial = materialService.getMaterialById(inventoryDTO.getMaterialId());
-            newInventory.setRawMaterial(rawMaterial);
-            Unit unit = unitService.findById(inventoryDTO.getUnitId());
-            newInventory.setUnit(unit);
-            newInventory.setQuantity(inventoryDTO.getQuantity());
-            newInventory.setBranch(employeeService.getCurrentEmployee().getBranch());
-            newInventory.setCreatedAt(new Date());
-            inventoryRepository.save(newInventory);
+
+            InventoryHistory inventoryHistory = new InventoryHistory();
+            inventoryHistory.setQuantity(inventoryDTO.getQuantity());
+            inventoryHistory.setRawMaterial(materialService.getMaterialById(inventoryDTO.getMaterialId()));
+            inventoryHistory.setUnit(unitService.findById(inventoryDTO.getUnitId()));
+            inventoryHistory.setBranch(employeeService.getCurrentEmployee().getBranch());
+            inventoryHistory.setQuantity(inventoryDTO.getQuantity());
+            inventoryHistoryRepository.save(inventoryHistory);
         });
         return ResponseEntity.ok("");
     }

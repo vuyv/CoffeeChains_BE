@@ -11,4 +11,6 @@ public interface InventoryService {
     ResponseEntity<String> addMaterials(List<InventoryDTO> inventoryDTOs);
 
     List<Inventory> getMaterialsByBranch();
+
+    Inventory getInventoryById(short materialId, short unitId);
 }

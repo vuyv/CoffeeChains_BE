@@ -67,6 +67,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Branch getBranchOfCurrentEmployee(){
+        return getCurrentEmployee().getBranch();
+    }
+
+    @Override
     public Employee changePassword(short id, PasswordDTO passwordDTO) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
         Password password = passwordConverter.toEntity(passwordDTO);

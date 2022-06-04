@@ -4,6 +4,7 @@ import com.enclave.backend.dto.EmployeeDTO;
 import com.enclave.backend.dto.PasswordDTO;
 import com.enclave.backend.dto.PasswordResetDTO;
 import com.enclave.backend.dto.employee.BranchEmployeeDTO;
+import com.enclave.backend.entity.Branch;
 import com.enclave.backend.entity.Employee;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -45,4 +46,6 @@ public interface EmployeeService extends UserDetailsService {
     List<Employee> getEmployeeHasRoleManager();
 
     Employee getEmployeeHasRoleOwner();
+
+    Branch getBranchOfCurrentEmployee();
 }
