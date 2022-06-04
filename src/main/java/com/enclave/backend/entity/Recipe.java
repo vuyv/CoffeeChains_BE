@@ -22,5 +22,5 @@ public class Recipe {
     private Material material;
 
     @Column
-    private double amount;
+    private int amount;
 }
