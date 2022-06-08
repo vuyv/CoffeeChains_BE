@@ -7,5 +7,5 @@ public class UnitDTO {
     private short id;
     private String unit;
     private double netWeight;
-    private double rate;
+    private int rate;
 }

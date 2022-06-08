@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import java.io.IOException;
 
-@EnableCaching
+//@EnableCaching
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class BackendApplication {
 

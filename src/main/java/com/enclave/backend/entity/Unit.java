@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -24,14 +23,10 @@ public class Unit {
     private double netWeight;
 
     @Column
-    private double rate;
+    private int rate;
 
     @ManyToMany(mappedBy = "units")
     @JsonIgnore
     private Collection<Material> materials;
 
-
-//    @OneToMany(mappedBy = "unit", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private Collection<UnitMaterial> unitMaterials = new ArrayList<>();
 }
