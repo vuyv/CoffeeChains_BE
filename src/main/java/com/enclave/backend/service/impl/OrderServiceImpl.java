@@ -5,6 +5,7 @@ import com.enclave.backend.converter.OrderDetailConverter;
 import com.enclave.backend.dto.OrderDTO;
 import com.enclave.backend.dto.OrderDetailDTO;
 import com.enclave.backend.dto.ProductInOrderDTO;
+import com.enclave.backend.dto.RecipeResponseDTO;
 import com.enclave.backend.entity.*;
 import com.enclave.backend.repository.OrderRepository;
 import com.enclave.backend.repository.ProductRepository;
@@ -13,6 +14,8 @@ import com.enclave.backend.service.OrderIdGenerator;
 import com.enclave.backend.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDetailConverter orderDetailConverter;
+
+    @Autowired
+    private RecipeServiceImpl recipeService;
+
+    @Autowired
+    private final StringRedisTemplate redisTemplate;
 
     @Autowired
     private DateUtil dateUtil;
@@ -130,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
             OrderDetail orderDetail = orderDetailConverter.toEntity(orderDetailDTO);
             orderDetail.setOrder(newOrder);
             orderDetails.add(orderDetail);
+            decrementTotalAmountOnRedis(orderDetail.getProduct(), orderDetail.getQuantity());
         });
         newOrder.setOrderDetails(orderDetails);
 
@@ -152,6 +162,14 @@ public class OrderServiceImpl implements OrderService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
     }
 
+    public void decrementTotalAmountOnRedis(Product product, short quantity){
+        List<RecipeResponseDTO> ingredients = recipeService.getRecipeByProduct(product.getId());
+        System.out.println("PRODUCT SOLD: " + product.getName());
+        for(RecipeResponseDTO material : ingredients){
+            redisTemplate.boundValueOps(material.getMaterialName()).decrement(material.getAmount()*quantity);
+            System.out.println("THEO MATERIAL: " +material.getMaterialName() + " " + redisTemplate.boundValueOps(material.getMaterialName()).get());
+        }
+    }
     @Override
     public boolean isValidTotal(OrderDTO orderDTO, double total) {
         return orderDTO.getTotalPrice() == total;

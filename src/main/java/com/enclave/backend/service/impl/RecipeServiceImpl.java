@@ -3,31 +3,33 @@ package com.enclave.backend.service.impl;
 import com.enclave.backend.converter.RecipeConverter;
 import com.enclave.backend.dto.RecipeDTO;
 import com.enclave.backend.dto.RecipeResponseDTO;
-import com.enclave.backend.entity.Inventory;
 import com.enclave.backend.entity.Recipe;
 import com.enclave.backend.repository.RecipeRepository;
-import com.enclave.backend.service.InventoryService;
-import com.enclave.backend.service.MaterialService;
 import com.enclave.backend.service.RecipeService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@AllArgsConstructor
 @Service
 @Slf4j
 public class RecipeServiceImpl implements RecipeService {
+
     @Autowired
     private RecipeRepository recipeRepository;
+
     @Autowired
     private RecipeConverter recipeConverter;
+
     @Autowired
-    private InventoryService inventoryService;
-    @Autowired
-    private MaterialService materialService;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public List<Recipe> createRecipe(List<RecipeDTO> recipeDTOs) {
@@ -43,7 +45,7 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeResponseDTO> getRecipeByProduct(short productId) {
         List<RecipeResponseDTO> responseDTOS = new ArrayList<>();
         List<Object[]> response = recipeRepository.getRecipeByProduct(productId);
-        for (Object[] item : response) {
+        for(Object[] item : response){
             RecipeResponseDTO dto = new RecipeResponseDTO();
             dto.setMaterialId(Short.parseShort(String.valueOf(item[0])));
             dto.setMaterialName(String.valueOf(item[1]));
@@ -55,11 +57,27 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public int estimateProductInStock(short productId) {
-        int estimate = 0;
         List<RecipeResponseDTO> recipeByProduct = getRecipeByProduct(productId);
-        for (RecipeResponseDTO material : recipeByProduct) {
-            Inventory inventory = (Inventory) inventoryService.getMaterialsByBranch();
+        List<Integer> numbersEstimate = new ArrayList<>();
+
+        for (RecipeResponseDTO recipe: recipeByProduct) {
+            if(redisTemplate.hasKey(recipe.getMaterialName()) == false){
+                return 0;
+            }
+            int totalRateOnRedis = Integer.parseInt(redisTemplate.boundValueOps(recipe.getMaterialName()).get());
+            int inStock = totalRateOnRedis / recipe.getAmount();
+            System.out.println(recipe.getMaterialName() + " ON REDIS: " + totalRateOnRedis);
+            System.out.println("Estimate: " +  + inStock);
+            numbersEstimate.add(inStock);
+//                }
         }
+
+//        if(numbersEstimate.size() != recipeByProduct.size()){
+//            numbersEstimate.add(0);
+//        }
+
+        int estimate = Collections.min(numbersEstimate);
+        System.out.println("=> AVAILABLE : " + estimate);
         return estimate;
     }
 
