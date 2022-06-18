@@ -32,7 +32,7 @@ public class InventoryHistoryAPI {
     }
 
     @GetMapping("/{time}")
-    public List<InventoryHistory> getDailyInventoryByTime(@PathVariable("time")String time){
+    public List<InventoryHistory> getInventoryHistoryByTime(@PathVariable("time")String time){
         return inventoryHistoryService.getInventoryHistoryByTime( time);
     }
 }

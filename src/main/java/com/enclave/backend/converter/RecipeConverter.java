@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class RecipeConverter {
     @Autowired
     private ProductService productService;
+
     @Autowired
     private MaterialService materialService;
 
