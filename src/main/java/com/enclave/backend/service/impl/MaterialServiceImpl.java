@@ -12,19 +12,21 @@ import java.util.List;
 
 @Service
 public class MaterialServiceImpl implements MaterialService {
+
     @Autowired
     private MaterialConverter materialConverter;
+
     @Autowired
     private MaterialRepository materialRepository;
 
     @Override
     public List<Material> getAllMaterial() {
-        return materialRepository.findAll() ;
+        return materialRepository.findAll();
     }
 
     @Override
     public Material getMaterialById(short materialId) {
-        return materialRepository.findById(materialId).orElseThrow(()-> new IllegalArgumentException("Invalid Material id: " + materialId));
+        return materialRepository.findById(materialId).orElseThrow(() -> new IllegalArgumentException("Invalid Material id: " + materialId));
     }
 
     @Override

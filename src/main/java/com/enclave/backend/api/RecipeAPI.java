@@ -1,5 +1,7 @@
 package com.enclave.backend.api;
 
+import com.enclave.backend.dto.CustomRecipeDTO;
+import com.enclave.backend.dto.ProductResponseDTO;
 import com.enclave.backend.dto.RecipeDTO;
 import com.enclave.backend.dto.RecipeResponseDTO;
 import com.enclave.backend.entity.Recipe;
@@ -35,8 +37,14 @@ public class RecipeAPI {
         return recipeService.updateRecipe(recipeDTOs);
     }
 
-    @GetMapping("/{id}")
-    public List<Recipe> getRecipeByProductId(@PathVariable ("id")short productId) {
-        return recipeService.getRecipeByProductId(productId);
+
+    @GetMapping("/byMaterial/{materialId}")
+    public List<CustomRecipeDTO> getRecipeByMaterialId(@PathVariable ("materialId")short materialId) {
+        return recipeService.getRecipesByMaterialId(materialId);
+    }
+
+    @GetMapping("/estimate/material/{materialId}")
+    public List<ProductResponseDTO> estimateByMaterial(@PathVariable ("materialId")short materialId){
+        return recipeService.estimateByMaterial(materialId);
     }
 }

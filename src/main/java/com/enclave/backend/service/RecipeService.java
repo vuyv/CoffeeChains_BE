@@ -1,5 +1,7 @@
 package com.enclave.backend.service;
 
+import com.enclave.backend.dto.CustomRecipeDTO;
+import com.enclave.backend.dto.ProductResponseDTO;
 import com.enclave.backend.dto.RecipeDTO;
 import com.enclave.backend.dto.RecipeResponseDTO;
 import com.enclave.backend.entity.Recipe;
@@ -17,5 +19,7 @@ public interface RecipeService {
 
     List<Recipe> updateRecipe(List<RecipeDTO> recipeDTO);
 
-    List<Recipe> getRecipeByProductId(short productId);
+    List<CustomRecipeDTO> getRecipesByMaterialId(short materialId);
+
+    List<ProductResponseDTO> estimateByMaterial(short materialId);
 }

@@ -18,12 +18,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private CategoryRepository categoryRepository;
-
     @Autowired
     private ProductConverter productConverter;
+
 
     @Override
     public Product createProduct(ProductDTO product) {
@@ -51,7 +50,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(oldProduct);
     }
 
-
     //TODO: Pagination
     @Override
     public List<Product> getProducts() {
@@ -60,12 +58,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(short id) {
-        return productRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Invalid product id: " + id));
+        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product id: " + id));
     }
 
     @Override
     public List<Product> findByCategory(short categoryId) {
-        return  productRepository.findByCategory(categoryId);
+        return productRepository.findByCategory(categoryId);
     }
 
     @Override
@@ -81,14 +79,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> findByCategoryAndStatus(short categoryId, String status){
+    public List<Product> findByCategoryAndStatus(short categoryId, String status) {
         Product.Status statusEnum = Product.Status.valueOf(status.toUpperCase(Locale.ROOT));
         List<Product> products = productRepository.findByCategoryAndStatus(categoryId, statusEnum);
         return products;
     }
 
     @Override
-    public List<Product> findByStatus(String status){
+    public List<Product> findByStatus(String status) {
         Product.Status statusEnum = Product.Status.valueOf(status.toUpperCase(Locale.ROOT));
         List<Product> products = productRepository.findByStatus(statusEnum);
         return products;

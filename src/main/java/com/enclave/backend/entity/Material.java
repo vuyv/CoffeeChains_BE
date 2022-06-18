@@ -1,11 +1,8 @@
 package com.enclave.backend.entity;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -19,6 +16,9 @@ public class Material {
 
     @Column(length = 30)
     private String name;
+
+    @Column
+    private String image;
 
     @ManyToMany
     @JoinTable(name = "unit_material",
