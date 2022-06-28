@@ -7,6 +7,7 @@ import com.enclave.backend.dto.OrderDetailDTO;
 import com.enclave.backend.dto.ProductInOrderDTO;
 import com.enclave.backend.dto.RecipeResponseDTO;
 import com.enclave.backend.entity.*;
+import com.enclave.backend.observer.RedisMessagePublisher;
 import com.enclave.backend.repository.OrderRepository;
 import com.enclave.backend.repository.ProductRepository;
 import com.enclave.backend.service.DiscountService;
@@ -14,12 +15,14 @@ import com.enclave.backend.service.OrderIdGenerator;
 import com.enclave.backend.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -35,34 +38,26 @@ import static com.enclave.backend.entity.DateUtil.*;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
+    private final StringRedisTemplate redisTemplate;
+    @Autowired
     private OrderConverter orderConverter;
-
     @Autowired
     private OrderRepository orderRepository;
-
     @Autowired
     private DiscountService discountService;
-
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private OrderIdGenerator orderIdGenerator;
-
     @Autowired
     private EmployeeServiceImpl employeeService;
-
     @Autowired
     private OrderDetailConverter orderDetailConverter;
-
     @Autowired
     private RecipeServiceImpl recipeService;
 
     @Autowired
-    private final StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private DateUtil dateUtil;
+    private RedisMessagePublisher publisher;
 
     private List<ProductInOrderDTO> getListProductInFE(List<OrderDetailDTO> orderDetailDTOs) {
         List<ProductInOrderDTO> productsInFE = new ArrayList<>();
@@ -104,7 +99,10 @@ public class OrderServiceImpl implements OrderService {
         }
         total -= total * discount.getPercent() / 100;
         ResponseEntity.status(HttpStatus.OK);
-        return total;
+
+        DecimalFormat f = new DecimalFormat("##.00");
+        f.setRoundingMode(RoundingMode.CEILING);
+        return Double.parseDouble(f.format(total));
     }
 
     private double calculateTotal(List<OrderDetailDTO> orderDetailDTOS, List<Product> productsInDB) {
@@ -139,37 +137,54 @@ public class OrderServiceImpl implements OrderService {
             OrderDetail orderDetail = orderDetailConverter.toEntity(orderDetailDTO);
             orderDetail.setOrder(newOrder);
             orderDetails.add(orderDetail);
-            decrementTotalAmountOnRedis(orderDetail.getProduct(), orderDetail.getQuantity());
+
         });
         newOrder.setOrderDetails(orderDetails);
 
-        if (orderDTO.getDiscount_code() != "" ) {
+        if (orderDTO.getDiscount_code() != "") {
             total = applyDiscountCode(total, orderDTO.getDiscount_code(), date);
-            if (isValidTotal(orderDTO, total)) {
+            BigDecimal a2 = new BigDecimal(total);
+            BigDecimal roundOff2 = a2.setScale(2, RoundingMode.HALF_EVEN);
+            double totalFormatted = roundOff2.doubleValue();
+
+            if (isValidTotal(orderDTO, totalFormatted)) {
                 newOrder.setDiscount(discountService.getDiscountByCode(orderDTO.getDiscount_code()));
-                newOrder.setTotalPrice(total);
+                newOrder.setTotalPrice(totalFormatted);
                 orderRepository.save(newOrder);
+                newOrder.getOrderDetails().forEach(orderDetail -> {
+                    decrementTotalAmountOnRedis(orderDetail.getProduct(), orderDetail.getQuantity());
+                });
                 return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
         }
+        BigDecimal a = new BigDecimal(total);
+        BigDecimal roundOff = a.setScale(2, RoundingMode.HALF_EVEN);
+        double totalFormatted = roundOff.doubleValue();
+        if (isValidTotal(orderDTO, totalFormatted)) {
+            newOrder.setTotalPrice(totalFormatted);
 
-        if (isValidTotal(orderDTO, total)) {
-            newOrder.setTotalPrice(total);
             orderRepository.save(newOrder);
+            newOrder.getOrderDetails().forEach(orderDetail -> {
+                decrementTotalAmountOnRedis(orderDetail.getProduct(), orderDetail.getQuantity());
+            });
             return ResponseEntity.status(HttpStatus.OK).header("Created order successful").body(newOrder);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Invalid total money").body(null);
     }
 
-    public void decrementTotalAmountOnRedis(Product product, short quantity){
+    public void decrementTotalAmountOnRedis(Product product, short quantity) {
+        List<Short> materialIdList = new ArrayList<>();
         List<RecipeResponseDTO> ingredients = recipeService.getRecipeByProduct(product.getId());
         System.out.println("PRODUCT SOLD: " + product.getName());
-        for(RecipeResponseDTO material : ingredients){
-            redisTemplate.boundValueOps(material.getMaterialName()).decrement(material.getAmount()*quantity);
-            System.out.println("THEO MATERIAL: " +material.getMaterialName() + " " + redisTemplate.boundValueOps(material.getMaterialName()).get());
+        for (RecipeResponseDTO material : ingredients) {
+            redisTemplate.boundValueOps(material.getMaterialName()).decrement(material.getAmount() * quantity);
+            System.out.println("THEO MATERIAL: " + material.getMaterialName() + " " + redisTemplate.boundValueOps(material.getMaterialName()).get());
+            materialIdList.add(material.getMaterialId());
         }
+        publisher.publish(materialIdList);
     }
+
     @Override
     public boolean isValidTotal(OrderDTO orderDTO, double total) {
         return orderDTO.getTotalPrice() == total;
@@ -177,9 +192,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findOrderById(String id) {
-        Optional<Order> orderOptional =  orderRepository.findById(id);
+        Optional<Order> orderOptional = orderRepository.findById(id);
         Order order = null;
-        if (orderOptional.isPresent()){
+        if (orderOptional.isPresent()) {
             order = orderOptional.get();
         }
         return order;
@@ -190,10 +205,10 @@ public class OrderServiceImpl implements OrderService {
         Date currentDate = new Date();
         StringBuilder key = orderIdGenerator.generateKey(employeeService.getCurrentEmployee().getBranch(), currentDate);
         String orderId = String.valueOf(key.append(String.format("%03d", ordinalNumber)));
-        Optional<Order> orderOptional =  orderRepository.findById(orderId);
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
         Order order = null;
-        if (orderOptional.isPresent()){
-           order = orderOptional.get();
+        if (orderOptional.isPresent()) {
+            order = orderOptional.get();
         }
         return order;
     }
@@ -235,35 +250,35 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getDailyOrdersInBranch(String date) {
-        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
+        short branchId = employeeService.getCurrentEmployee().getBranch().getId();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfDay(selectedDate).toString();
         String endDate = endOfDay((selectedDate)).toString();
 
-        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate );
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate);
     }
 
     @Override
     public List<Order> getWeeklyOrdersInBranch(String date) {
-        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
+        short branchId = employeeService.getCurrentEmployee().getBranch().getId();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfWeek(selectedDate).toString();
         String endDate = endOfWeek((selectedDate)).toString();
 
-        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate  );
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate);
     }
 
     @Override
     public List<Order> getMonthlyOrdersInBranch(String date) {
-        short branchId = employeeService.getBranchOfCurrentEmployee().getId();
+        short branchId = employeeService.getCurrentEmployee().getBranch().getId();
 
         Date selectedDate = StringtoDate(date);
         String startDate = startOfMonth(selectedDate).toString();
         String endDate = endOfMonth((selectedDate)).toString();
 
-        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate  );
+        return orderRepository.getOrdersInBranchByTime(branchId, startDate, endDate);
     }
 
     //manager
@@ -276,7 +291,7 @@ public class OrderServiceImpl implements OrderService {
         short branchId = employee.getBranch().getId();
 
         String last7days = last7days(selectedDate).toString();
-        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days,date );
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days, date);
 
         return queryResult;
     }
@@ -285,7 +300,7 @@ public class OrderServiceImpl implements OrderService {
     public List<Object[]> getCountOfTotalPriceEachBranchWeekly(String date, short branchId) {
         Date selectedDate = StringtoDate(date);
         String last7days = last7days(selectedDate).toString();
-        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days,date );
+        List<Object[]> queryResult = orderRepository.getCountOfTotalPriceInBranchWeekly(branchId, last7days, date);
 
         return queryResult;
     }
@@ -296,8 +311,8 @@ public class OrderServiceImpl implements OrderService {
         short branchId = employee.getBranch().getId();
         int count = 0;
         try {
-            count = orderRepository.getCountOfBranchOrderByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+            count = orderRepository.getCountOfBranchOrderByDate(branchId, new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e) {
             System.out.println(e);
         }
         return count;
@@ -307,8 +322,8 @@ public class OrderServiceImpl implements OrderService {
     public int getCountOfEachBranchOrderByDate(String date, short branchId) {
         int count = 0;
         try {
-            count = orderRepository.getCountOfBranchOrderByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+            count = orderRepository.getCountOfBranchOrderByDate(branchId, new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e) {
             System.out.println(e);
         }
         return count;
@@ -320,8 +335,8 @@ public class OrderServiceImpl implements OrderService {
         short branchId = employee.getBranch().getId();
         double count = 0;
         try {
-            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId, new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e) {
             System.out.println(e);
         }
         return count;
@@ -331,8 +346,8 @@ public class OrderServiceImpl implements OrderService {
     public double getCountOfEachBranchTotalPriceByDate(String date, short branchId) {
         double count = 0;
         try {
-            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId,new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+            count = orderRepository.getCountOfBranchTotalPriceByDate(branchId, new SimpleDateFormat("yyyy-MM-dd").parse(date));
+        } catch (Exception e) {
             System.out.println(e);
         }
         return count;
@@ -344,10 +359,10 @@ public class OrderServiceImpl implements OrderService {
         double count = 0;
         try {
             count = orderRepository.getCountOfAllTotalPriceByDate(new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
-    return count;
+        return count;
     }
 
     @Override
@@ -355,7 +370,7 @@ public class OrderServiceImpl implements OrderService {
         int count = 0;
         try {
             count = orderRepository.getCountOfAllOrderByDate(new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return count;
@@ -366,7 +381,7 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {
             queryResult = orderRepository.getCountOfOrderEachBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return queryResult;
@@ -377,7 +392,7 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {
             queryResult = orderRepository.getCountOfTotalPriceEachBranch(new SimpleDateFormat("yyyy-MM-dd").parse(date));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return queryResult;
@@ -404,10 +419,11 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {
             queryResult = orderRepository.topWeeklySeller();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
-        return queryResult;    }
+        return queryResult;
+    }
 
     @Override
     public double getCurrentMonthRevenue() {
@@ -427,7 +443,7 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> queryResult = new ArrayList<Object[]>();
         try {
             queryResult = orderRepository.getBestSellingProducts(branchId);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return queryResult;
@@ -461,7 +477,7 @@ public class OrderServiceImpl implements OrderService {
     public double compareLastMonthBranchRevenue() {
         Employee employee = employeeService.getCurrentEmployee();
         short branchId = employee.getBranch().getId();
-        double lastMonthRevenue =  orderRepository.getLastMonthRevenueEachBranch(branchId);
+        double lastMonthRevenue = orderRepository.getLastMonthRevenueEachBranch(branchId);
         double currentMonthRevenue = orderRepository.getCurrentMonthRevenueEachBranch(branchId);
         double compare = currentMonthRevenue - lastMonthRevenue;
         return compare;
@@ -469,7 +485,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public double compareLastMonthOfBranchRevenue(short branchId) {
-        double lastMonthRevenue =  orderRepository.getLastMonthRevenueEachBranch(branchId);
+        double lastMonthRevenue = orderRepository.getLastMonthRevenueEachBranch(branchId);
         double currentMonthRevenue = orderRepository.getCurrentMonthRevenueEachBranch(branchId);
         double compare = currentMonthRevenue - lastMonthRevenue;
         return compare;
