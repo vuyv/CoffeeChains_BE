@@ -3,14 +3,13 @@ package com.enclave.backend.service.impl;
 import com.enclave.backend.dto.InventoryDTO;
 import com.enclave.backend.entity.DailyInventory;
 import com.enclave.backend.entity.Inventory;
+import com.enclave.backend.observer.RedisMessagePublisher;
 import com.enclave.backend.repository.DailyInventoryRepository;
 import com.enclave.backend.repository.InventoryRepository;
 import com.enclave.backend.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +21,14 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.enclave.backend.entity.DateUtil.*;
+
 @AllArgsConstructor
 @Service
 @Slf4j
 public class DailyInventoryServiceImpl implements DailyInventoryService {
+
+    @Autowired
+    private final StringRedisTemplate redisTemplate;
 
     @Autowired
     private InventoryService inventoryService;
@@ -46,7 +49,7 @@ public class DailyInventoryServiceImpl implements DailyInventoryService {
     private DailyInventoryRepository dailyInventoryRepository;
 
     @Autowired
-    private final StringRedisTemplate redisTemplate;
+    private RedisMessagePublisher publisher;
 
     @Override
     public ResponseEntity<DailyInventory> exportMaterials(List<InventoryDTO> dailyInventoryDTOs) {
@@ -81,19 +84,22 @@ public class DailyInventoryServiceImpl implements DailyInventoryService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public void setTotalRateOnRedis(List<DailyInventory> dailyInventoryList){
-        for(DailyInventory dailyInventory : dailyInventoryList) {
+    public void setTotalRateOnRedis(List<DailyInventory> dailyInventoryList) {
+        List<Short> materialIdList = new ArrayList<>();
+        for (DailyInventory dailyInventory : dailyInventoryList) {
             int totalRate = (int) (dailyInventory.getUnit().getRate() * dailyInventory.getQuantity());
             System.out.println(dailyInventory.getRawMaterial().getName() + " redis: " + redisTemplate.hasKey(dailyInventory.getRawMaterial().getName()));
             if (redisTemplate.hasKey(dailyInventory.getRawMaterial().getName())) {
                 redisTemplate.boundValueOps(dailyInventory.getRawMaterial().getName()).increment(totalRate);
                 System.out.println("SET VALUE: " + dailyInventory.getRawMaterial().getName() + " " + redisTemplate.boundValueOps(dailyInventory.getRawMaterial().getName()).get());
-
             } else {
                 redisTemplate.boundValueOps(dailyInventory.getRawMaterial().getName()).set(String.valueOf(totalRate));
                 System.out.println("SET VALUE 2: " + dailyInventory.getRawMaterial().getName() + " " + redisTemplate.boundValueOps(dailyInventory.getRawMaterial().getName()).get());
             }
+
+            materialIdList.add(dailyInventory.getRawMaterial().getId());
         }
+        publisher.publish(materialIdList);
     }
 
     @Override
