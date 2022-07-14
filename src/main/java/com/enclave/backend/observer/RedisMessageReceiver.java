@@ -20,6 +20,7 @@ import java.util.*;
 public class RedisMessageReceiver implements MessageListener {
     ObjectMapper objectMapper = new ObjectMapper();
 
+    @Lazy
     @Autowired
     private RecipeService recipeService;
 
@@ -48,8 +49,14 @@ public class RedisMessageReceiver implements MessageListener {
                 List <CustomRecipeDTO> updatedProducts = materialToProductMap.get(updatedMaterialId);
                 updatedProducts.forEach(product ->{
                     int estimateQuantity = estimateProductInStock(product.getProductId());
-                    result.put(product.getProductName(),estimateQuantity);
-                    redisTemplate.boundValueOps(product.getProductName()).set(String.valueOf(estimateQuantity));
+                    if(estimateQuantity > 0){
+                        result.put(product.getProductName(),estimateQuantity);
+                        redisTemplate.boundValueOps(product.getProductName()).set(String.valueOf(estimateQuantity));
+                    } else {
+                        result.put(product.getProductName(),0);
+                        redisTemplate.boundValueOps(product.getProductName()).set(String.valueOf(0));
+                    }
+
                 });
             }
             System.out.println("RESULT " + result);
