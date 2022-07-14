@@ -17,10 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Configuration
-@AllArgsConstructor
+//@AllArgsConstructor
 @Service
-@Slf4j
+//@Slf4j
 public class RecipeServiceImpl implements RecipeService {
     @Autowired
     private RecipeRepository recipeRepository;
@@ -50,6 +49,7 @@ public class RecipeServiceImpl implements RecipeService {
             dto.setMaterialId(Short.parseShort(String.valueOf(item[0])));
             dto.setMaterialName(String.valueOf(item[1]));
             dto.setAmount(Integer.parseInt(String.valueOf(item[2])));
+            dto.setImage(String.valueOf(item[3]));
             responseDTOS.add(dto);
         }
         return responseDTOS;

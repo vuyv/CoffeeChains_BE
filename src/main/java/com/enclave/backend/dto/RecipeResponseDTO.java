@@ -7,4 +7,5 @@ public class RecipeResponseDTO {
     private short materialId;
     private String materialName;
     private int amount;
+    private String image;
 }

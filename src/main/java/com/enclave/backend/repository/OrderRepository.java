@@ -71,6 +71,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT sum(orders.total_price) FROM orders where orders.status=\"CREATED\" and week(orders.created_at)=week(now())", nativeQuery = true)
     double getCurrentWeekRevenue();
 
+    @Cacheable("topWeeklySeller")
     @Query(value = "SELECT branch.name,sum(orders.total_price) AS TOTAL FROM Orders JOIN employee ON orders.created_by = employee.id JOIN branch ON employee.branch_id = branch.id where orders.status=\"CREATED\" AND  week(orders.created_at)=week(now()) group by branch.name ORDER BY TOTAL DESC LIMIT 6", nativeQuery = true)
     List<Object[]> topWeeklySeller();
 
